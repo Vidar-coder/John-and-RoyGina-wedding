@@ -44,45 +44,55 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_FOREST = "#052312"
 const IVORY = "#fffaf4"
-const CHAMPAGNE = "#E8D5A3"
-const NAV_GOLD =
-  "linear-gradient(180deg, #E8D5A3 0%, #CDB072 52%, #C4A265 100%)"
-const LIGHT_OVERLAY = "color-mix(in srgb, #f7f3e9 42%, rgb(91 74 55 / 22%))"
+const MOTIF_CREAM = "#f4f0e8"
+const MOTIF_BTN = `linear-gradient(180deg, color-mix(in srgb, ${MOTIF_BURGUNDY} 90%, #000) 0%, ${MOTIF_BURGUNDY} 52%, color-mix(in srgb, ${MOTIF_BURGUNDY} 88%, #000) 100%)`
+const LIGHT_OVERLAY = `color-mix(in srgb, ${MOTIF_FOREST} 38%, rgb(5 35 18 / 48%))`
 
 const palette = {
-  body: "var(--color-welcome-text)",
-  heading: "var(--color-welcome-navy)",
-  label: "var(--color-welcome-gold)",
-  accent: "var(--color-welcome-gold)",
+  body: `color-mix(in srgb, ${MOTIF_FOREST} 78%, #4a5c4e)`,
+  heading: MOTIF_FOREST,
+  label: MOTIF_BURGUNDY,
+  accent: MOTIF_BURGUNDY,
 } as const
 
 const modalCardStyle = {
   background: IVORY,
-  borderColor: "color-mix(in srgb, #CDB072 42%, transparent)",
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`,
   borderWidth: "1px",
   borderStyle: "solid" as const,
   boxShadow:
-    "0 18px 40px rgb(42 34 28 / 28%), inset 0 1px 0 rgb(255 250 244 / 70%)",
+    "0 18px 40px color-mix(in srgb, #052312 22%, transparent), inset 0 1px 0 rgb(255 250 244 / 70%)",
 } as const
 
 const innerSurfaceStyle = {
-  background: `color-mix(in srgb, ${IVORY} 82%, ${CHAMPAGNE})`,
-  borderColor: "color-mix(in srgb, #CDB072 22%, transparent)",
+  background: `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 16%, transparent)`,
 } as const
 
-const modalInputClass = `w-full rounded-lg border bg-[#fffaf4] px-2.5 py-1.5 font-goudy-italic ${sectionType.text} transition-all duration-300 focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-welcome-gold)_28%,transparent)] sm:px-3 sm:py-2`
+const modalInputClass = `w-full rounded-lg border bg-[#fffaf4] px-2.5 py-1.5 font-goudy-italic ${sectionType.text} transition-all duration-300 focus:ring-2 focus:ring-[color-mix(in_srgb,#531314_22%,transparent)] sm:px-3 sm:py-2`
 
 const modalInputStyle = {
-  borderColor: "color-mix(in srgb, #CDB072 32%, transparent)",
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 24%, transparent)`,
   color: palette.heading,
 } as const
 
 const modalLabelClass = `font-goudy-italic mb-1.5 flex flex-wrap items-center gap-1.5 ${sectionType.text} font-semibold sm:mb-2 sm:gap-2`
 
 const dividerLineStyle = {
-  background:
-    "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
+  background: `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
+} as const
+
+const primaryButtonStyle = {
+  backgroundColor: MOTIF_BURGUNDY,
+  borderColor: `color-mix(in srgb, ${MOTIF_FOREST} 32%, transparent)`,
+  color: IVORY,
+} as const
+
+const softSurfaceStyle = {
+  background: `color-mix(in srgb, ${IVORY} 94%, ${MOTIF_CREAM})`,
 } as const
 
 function HighlightedName({ name, query }: { name: string; query: string }) {
@@ -97,7 +107,7 @@ function HighlightedName({ name, query }: { name: string; query: string }) {
   return (
     <>
       {name.slice(0, index)}
-      <span className="font-semibold" style={{ color: "var(--color-welcome-gold)" }}>
+      <span className="font-semibold" style={{ color: MOTIF_BURGUNDY }}>
         {name.slice(index, index + trimmed.length)}
       </span>
       {name.slice(index + trimmed.length)}
@@ -549,8 +559,8 @@ export function GuestList() {
         className="relative mx-auto w-full max-w-[22.5rem] overflow-visible rounded-[1.85rem] px-5 pb-8 pt-6 text-center @container/rsvp sm:max-w-[24rem] sm:px-7 sm:pb-9 sm:pt-7"
         style={{
           background: IVORY,
-          border: "1px solid color-mix(in srgb, var(--color-welcome-gold) 38%, transparent)",
-          boxShadow: "0 10px 28px color-mix(in srgb, var(--color-welcome-gold) 12%, transparent)",
+          border: `1px solid color-mix(in srgb, ${MOTIF_BURGUNDY} 34%, transparent)`,
+          boxShadow: "0 10px 28px color-mix(in srgb, #052312 10%, transparent)",
         }}
       >
         <h2
@@ -568,7 +578,7 @@ export function GuestList() {
             className={`${theSeasons.className} block uppercase leading-[0.9] tracking-[0.08em] min-[400px]:tracking-[0.11em] sm:tracking-[0.13em] md:tracking-[0.14em]`}
             style={{
               fontSize: "var(--welcome-size)",
-              color: "var(--color-welcome-navy)",
+              color: MOTIF_FOREST,
             }}
           >
             RSVP
@@ -578,9 +588,9 @@ export function GuestList() {
             className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-1.5 block w-fit max-w-full px-1 leading-[0.88] sm:mt-2 sm:leading-[0.9]`}
             style={{
               fontSize: "var(--script-size)",
-              color: "var(--color-welcome-green)",
+              color: MOTIF_BURGUNDY,
               textShadow:
-                "0 1px 0 color-mix(in srgb, var(--color-welcome-bg) 95%, white), 0 0 10px color-mix(in srgb, var(--color-welcome-bg) 65%, white)",
+                "0 1px 0 color-mix(in srgb, #fffaf4 95%, white), 0 0 10px color-mix(in srgb, #531314 18%, transparent)",
             }}
           >
             Are you going
@@ -592,7 +602,7 @@ export function GuestList() {
 
         <p
           className={`font-goudy-italic mx-auto mt-3 max-w-[17.5rem] ${sectionType.textSnug} sm:mt-4`}
-          style={{ color: "var(--color-welcome-text)" }}
+          style={{ color: palette.body }}
         >
           Kindly confirm your attendance so we may prepare a place for you at our celebration.
         </p>
@@ -600,12 +610,12 @@ export function GuestList() {
         {siteConfig.details.rsvp.deadline ? (
           <p
             className={`${cinzel.className} ${sectionType.label} mx-auto mt-4 font-semibold uppercase tracking-[0.16em] sm:mt-5 sm:tracking-[0.18em]`}
-            style={{ color: "var(--color-welcome-gold)" }}
+            style={{ color: MOTIF_BURGUNDY }}
           >
             RSVP Deadline
             <span
               className={`${theSeasons.className} mt-2 block text-[1.45rem] font-normal normal-case leading-tight tracking-[0.04em] sm:text-[1.75rem] md:text-[1.95rem]`}
-              style={{ color: "var(--color-welcome-navy)" }}
+              style={{ color: MOTIF_FOREST }}
             >
               {siteConfig.details.rsvp.deadline.replace(/\.\s*$/, "")}
             </span>
@@ -618,8 +628,8 @@ export function GuestList() {
             setSearchQuery("")
             setShowSearchModal(true)
           }}
-          className={`${cinzel.className} ${sectionType.label} mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-full px-6 py-2.5 font-semibold uppercase tracking-[0.12em] shadow-[0_8px_18px_color-mix(in_srgb,var(--color-welcome-gold)_22%,transparent)] transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] sm:mt-6 sm:tracking-[0.14em]`}
-          style={{ background: NAV_GOLD, color: IVORY }}
+          className={`${cinzel.className} ${sectionType.label} mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-full px-6 py-2.5 font-semibold uppercase tracking-[0.12em] shadow-[0_8px_18px_color-mix(in_srgb,#531314_28%,transparent)] transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] sm:mt-6 sm:tracking-[0.14em]`}
+          style={{ background: MOTIF_BTN, color: IVORY }}
         >
           Tap here to respond
         </button>
@@ -649,7 +659,7 @@ export function GuestList() {
                 className="pointer-events-none absolute inset-x-6 top-0 h-px"
                 style={{
                   background:
-                    "linear-gradient(to right, transparent, var(--color-motif-yellow), transparent)",
+                    `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
                 }}
               />
               <button
@@ -698,14 +708,14 @@ export function GuestList() {
 
                 <div className="mx-auto mt-3 flex items-center justify-center gap-1.5 sm:mt-4">
                   <span className="h-px w-6 sm:w-8" style={dividerLineStyle} />
-                  <Heart className="h-3 w-3 sm:h-3.5 sm:w-3.5" style={{ color: "var(--color-welcome-gold)" }} aria-hidden />
+                  <Heart className="h-3 w-3 sm:h-3.5 sm:w-3.5" style={{ color: MOTIF_BURGUNDY }} aria-hidden />
                   <span className="h-px w-6 sm:w-8" style={dividerLineStyle} />
                 </div>
 
                 <div ref={searchRef} className="relative mt-4 sm:mt-5">
                   <Search
                     className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2"
-                    style={{ color: "var(--color-welcome-gold)" }}
+                    style={{ color: MOTIF_BURGUNDY }}
                   />
                   <input
                     id="rsvp-name-search"
@@ -715,14 +725,14 @@ export function GuestList() {
                     placeholder="Begin with your first name"
                     autoFocus
                     autoComplete="off"
-                    className="w-full rounded-full border bg-[#fffaf4] py-2.5 pl-10 pr-4 font-goudy-italic text-[0.95rem] shadow-sm outline-none transition-all duration-200 placeholder:text-[color-mix(in_srgb,var(--color-welcome-text)_45%,transparent)] sm:py-3 sm:text-base"
+                    className="w-full rounded-full border bg-[#fffaf4] py-2.5 pl-10 pr-4 font-goudy-italic text-[0.95rem] shadow-sm outline-none transition-all duration-200 placeholder:text-[color-mix(in_srgb,#052312_40%,transparent)] sm:py-3 sm:text-base"
                     style={{
                       borderColor: searchQuery
-                        ? "var(--color-welcome-gold)"
-                        : "color-mix(in srgb, var(--color-motif-deep) 22%, transparent)",
+                        ? MOTIF_BURGUNDY
+                        : `color-mix(in srgb, ${MOTIF_FOREST} 18%, transparent)`,
                       color: palette.heading,
                       boxShadow: searchQuery
-                        ? "0 0 0 3px color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)"
+                        ? `0 0 0 3px color-mix(in srgb, ${MOTIF_BURGUNDY} 20%, transparent)`
                         : undefined,
                     }}
                   />
@@ -733,13 +743,13 @@ export function GuestList() {
                 <div
                   className="border-t px-5 py-4 text-center sm:px-6 sm:py-5"
                   style={{
-                    borderColor: "color-mix(in srgb, var(--color-motif-deep) 10%, transparent)",
-                    background: "var(--color-welcome-bg-soft)",
+                    borderColor: `color-mix(in srgb, ${MOTIF_FOREST} 10%, transparent)`,
+                    ...softSurfaceStyle,
                   }}
                 >
                   <RefreshCw
                     className="mx-auto mb-2 h-4 w-4 animate-spin"
-                    style={{ color: "var(--color-welcome-gold)" }}
+                    style={{ color: MOTIF_BURGUNDY }}
                     aria-hidden
                   />
                   <p
@@ -755,8 +765,8 @@ export function GuestList() {
                 <div
                   className="border-t"
                   style={{
-                    borderColor: "color-mix(in srgb, #CDB072 28%, transparent)",
-                    background: `color-mix(in srgb, ${IVORY} 82%, ${CHAMPAGNE})`,
+                    borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 22%, transparent)`,
+                    background: `color-mix(in srgb, ${IVORY} 88%, ${MOTIF_CREAM})`,
                   }}
                 >
                   {filteredGuests.slice(0, 6).map((guest, index) => (
@@ -765,14 +775,14 @@ export function GuestList() {
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => handleSearchSelect(guest)}
-                      className="group flex w-full items-center gap-3 border-b px-5 py-3 text-left last:border-b-0 hover:bg-[color-mix(in_srgb,#fffaf4_55%,#E8D5A3)] sm:px-6 sm:py-3.5"
+                      className="group flex w-full items-center gap-3 border-b px-5 py-3 text-left last:border-b-0 hover:bg-[color-mix(in_srgb,#fffaf4_70%,#531314_8%)] sm:px-6 sm:py-3.5"
                       style={{
-                        borderColor: "color-mix(in srgb, #CDB072 22%, transparent)",
+                        borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 14%, transparent)`,
                       }}
                     >
                       <div
                         className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full sm:h-9 sm:w-9"
-                        style={{ background: NAV_GOLD }}
+                        style={{ background: MOTIF_BTN }}
                       >
                         <User className="h-3.5 w-3.5 text-[#fffaf4] sm:h-4 sm:w-4" />
                       </div>
@@ -786,7 +796,7 @@ export function GuestList() {
                         {guest.Email && guest.Email !== "Pending" && (
                           <div
                             className={`mt-0.5 truncate ${sectionType.label}`}
-                            style={{ color: "var(--color-welcome-text-soft)" }}
+                            style={{ color: `color-mix(in srgb, ${MOTIF_FOREST} 55%, transparent)` }}
                           >
                             {guest.Email}
                           </div>
@@ -794,14 +804,14 @@ export function GuestList() {
                       </div>
                       <ChevronRight
                         className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
-                        style={{ color: "var(--color-welcome-gold)" }}
+                        style={{ color: MOTIF_BURGUNDY }}
                       />
                     </button>
                   ))}
                   {filteredGuests.length > 6 && (
                     <p
                       className={`${cinzel.className} px-5 py-2.5 text-center text-[0.62rem] font-medium tracking-[0.14em] sm:px-6`}
-                      style={{ color: "var(--color-welcome-gold)" }}
+                      style={{ color: MOTIF_BURGUNDY }}
                     >
                       Keep typing to refine results
                     </p>
@@ -813,14 +823,14 @@ export function GuestList() {
                 <div
                   className="border-t px-5 py-4 sm:px-6 sm:py-5"
                   style={{
-                    borderColor: "color-mix(in srgb, var(--color-motif-deep) 10%, transparent)",
-                    background: "var(--color-welcome-bg-soft)",
+                    borderColor: `color-mix(in srgb, ${MOTIF_FOREST} 10%, transparent)`,
+                    ...softSurfaceStyle,
                   }}
                 >
                   <div className="mb-3 flex items-start gap-3">
                     <div
                       className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full"
-                      style={{ background: NAV_GOLD }}
+                      style={{ background: MOTIF_BTN }}
                     >
                       <UserPlus className="h-4 w-4 text-[#fffaf4]" />
                     </div>
@@ -846,7 +856,7 @@ export function GuestList() {
                       setShowRequestModal(true)
                     }}
                     className={`${cinzel.className} flex w-full items-center justify-center rounded-full py-2.5 text-[0.72rem] font-semibold tracking-[0.12em] text-[#fffaf4] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]`}
-                    style={{ background: NAV_GOLD }}
+                    style={{ background: MOTIF_BTN }}
                   >
                     <UserPlus className="mr-2 h-3.5 w-3.5" />
                     Request to Join
@@ -876,7 +886,7 @@ export function GuestList() {
               className="pointer-events-none absolute inset-x-5 top-0 h-px sm:inset-x-8"
               style={{
                 background:
-                  "linear-gradient(to right, transparent, var(--color-motif-yellow), transparent)",
+                  `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
               }}
             />
 
@@ -1021,11 +1031,7 @@ export function GuestList() {
                     <button
                       onClick={handleCloseModal}
                       className={`${cinzel.className} mt-4 rounded-sm border px-6 py-2.5 ${sectionType.label} font-semibold uppercase tracking-[0.2em] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:mt-5 sm:px-8 sm:py-3 md:mt-6`}
-                      style={{
-                        backgroundColor: palette.accent,
-                        borderColor: "color-mix(in srgb, var(--color-welcome-navy) 35%, transparent)",
-                        color: "var(--color-welcome-bg)",
-                      }}
+                      style={primaryButtonStyle}
                     >
                       Close
                     </button>
@@ -1060,7 +1066,7 @@ export function GuestList() {
                               ? {
                                   borderColor: palette.accent,
                                   backgroundColor:
-                                    "color-mix(in srgb, var(--color-welcome-gold) 14%, white)",
+                                    `color-mix(in srgb, ${MOTIF_BURGUNDY} 10%, white)`,
                                 }
                               : { borderColor: innerSurfaceStyle.borderColor }
                           }
@@ -1070,7 +1076,7 @@ export function GuestList() {
                               className="h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5"
                               style={{
                                 color:
-                                  formData.RSVP === "Yes" ? palette.accent : "var(--color-welcome-text-soft)",
+                                  formData.RSVP === "Yes" ? palette.accent : `color-mix(in srgb, ${MOTIF_FOREST} 45%, transparent)`,
                               }}
                             />
                             <span
@@ -1087,13 +1093,13 @@ export function GuestList() {
                           className={`relative rounded-lg border-2 p-2 transition-all duration-300 sm:p-2.5 md:p-3 lg:p-4 ${
                             formData.RSVP === "No"
                               ? "scale-[1.02] border-red-500 bg-red-50 shadow-md"
-                              : "border-[color-mix(in_srgb,var(--color-motif-deep)_10%,transparent)] bg-white hover:shadow-sm"
+                              : `border-[color-mix(in_srgb,${MOTIF_FOREST}_10%,transparent)] bg-white hover:shadow-sm`
                           }`}
                         >
                           <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                             <XCircle
                               className={`h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5 ${
-                                formData.RSVP === "No" ? "text-red-600" : "text-[color-mix(in_srgb,var(--color-welcome-text)_45%,transparent)]"
+                                formData.RSVP === "No" ? "text-red-600" : "text-[color-mix(in_srgb,#052312_45%,transparent)]"
                               }`}
                             />
                             <span
@@ -1230,11 +1236,7 @@ export function GuestList() {
                         type="submit"
                         disabled={isLoading}
                         className={`${cinzel.className} flex w-full items-center justify-center gap-1.5 rounded-sm border py-2.5 ${sectionType.label} font-semibold uppercase tracking-[0.2em] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-70 sm:gap-2 sm:py-3`}
-                        style={{
-                          backgroundColor: palette.accent,
-                          borderColor: "color-mix(in srgb, var(--color-welcome-navy) 35%, transparent)",
-                          color: "var(--color-welcome-bg)",
-                        }}
+                        style={primaryButtonStyle}
                       >
                         {isLoading ? (
                           <>
@@ -1289,7 +1291,7 @@ export function GuestList() {
                 className="h-[3px] w-full"
                 style={{
                   background:
-                    "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
+                    `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
                 }}
               />
               <div className="px-6 pb-6 pt-6 text-center">
@@ -1334,7 +1336,7 @@ export function GuestList() {
                   type="button"
                   onClick={handleClosePhoneAlert}
                   className={`${cinzel.className} inline-flex min-h-11 w-full items-center justify-center rounded-full px-6 py-2.5 ${sectionType.label} font-semibold uppercase tracking-[0.16em] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]`}
-                  style={{ background: NAV_GOLD, color: IVORY }}
+                  style={{ background: MOTIF_BTN, color: IVORY }}
                 >
                   Add my number
                 </button>
@@ -1355,7 +1357,7 @@ export function GuestList() {
                   className="h-[3px] w-full"
                   style={{
                     background:
-                      "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
+                      `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
                   }}
                 />
                 <div className="px-6 pb-6 pt-6 text-center">
@@ -1364,7 +1366,7 @@ export function GuestList() {
                       className="absolute h-14 w-14 animate-ping rounded-full"
                       style={{
                         animationDuration: "2.5s",
-                        backgroundColor: "color-mix(in srgb, var(--color-welcome-gold) 20%, transparent)",
+                        backgroundColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 18%, transparent)`,
                       }}
                     />
                     <div
@@ -1422,11 +1424,7 @@ export function GuestList() {
                       }, 100)
                     }}
                     className={`${cinzel.className} mb-3 inline-flex w-full items-center justify-center gap-2 rounded-sm border py-3 ${sectionType.label} font-semibold uppercase tracking-[0.2em] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]`}
-                    style={{
-                      backgroundColor: palette.accent,
-                      borderColor: "color-mix(in srgb, var(--color-welcome-navy) 35%, transparent)",
-                      color: "var(--color-welcome-bg)",
-                    }}
+                    style={primaryButtonStyle}
                   >
                     <MessageSquare className="h-3 w-3 flex-shrink-0" />
                     Leave a Message
@@ -1468,7 +1466,7 @@ export function GuestList() {
                 className="pointer-events-none absolute inset-x-5 top-0 h-px sm:inset-x-8"
                 style={{
                   background:
-                    "linear-gradient(to right, transparent, var(--color-motif-yellow), transparent)",
+                    `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
                 }}
               />
 
@@ -1635,11 +1633,7 @@ export function GuestList() {
                       type="submit"
                       disabled={isLoading}
                       className={`${cinzel.className} flex w-full items-center justify-center gap-1.5 rounded-sm border py-2.5 ${sectionType.label} font-semibold uppercase tracking-[0.2em] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-70 sm:gap-2 sm:py-3`}
-                      style={{
-                        backgroundColor: palette.accent,
-                        borderColor: "color-mix(in srgb, var(--color-welcome-navy) 35%, transparent)",
-                        color: "var(--color-welcome-bg)",
-                      }}
+                      style={primaryButtonStyle}
                     >
                       {isLoading ? (
                         <>
@@ -1659,41 +1653,52 @@ export function GuestList() {
 
               {/* Enhanced Success Overlay */}
               {requestSuccess && (
-                <div className="absolute inset-0 bg-motif-soft/98 backdrop-blur-md flex items-center justify-center z-50 animate-in fade-in duration-300 p-2 sm:p-3 md:p-4">
+                <div
+                  className="absolute inset-0 flex items-center justify-center z-50 animate-in fade-in duration-300 p-2 backdrop-blur-md sm:p-3 md:p-4"
+                  style={{ background: `color-mix(in srgb, ${IVORY} 96%, ${MOTIF_CREAM})` }}
+                >
                   <div className="text-center p-3 sm:p-4 md:p-5 lg:p-6 max-w-sm mx-auto">
-                    {/* Enhanced Icon Circle */}
                     <div className="relative inline-flex items-center justify-center mb-3 sm:mb-4">
-                      {/* Animated rings */}
-                      <div className="absolute inset-0 rounded-full border-2 border-motif-deep/20 animate-ping" />
-                      <div className="absolute inset-0 rounded-full border-2 border-motif-deep/30" />
-                      {/* Icon container */}
-                      <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 bg-white rounded-full flex items-center justify-center shadow-xl">
-                        <CheckCircle className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-10 lg:w-10 text-white" strokeWidth={2.5} />
+                      <div
+                        className="absolute inset-0 rounded-full border-2 animate-ping"
+                        style={{ borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 25%, transparent)` }}
+                      />
+                      <div
+                        className="relative flex h-12 w-12 items-center justify-center rounded-full shadow-xl sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20"
+                        style={{ backgroundColor: MOTIF_BURGUNDY }}
+                      >
+                        <CheckCircle className="h-6 w-6 text-white sm:h-7 sm:w-7 md:h-8 md:w-8 lg:h-10 lg:w-10" strokeWidth={2.5} />
                       </div>
                     </div>
-                    
-                    {/* Title */}
-                    <h4 className={`mb-2 font-serif font-bold text-motif-deep sm:mb-3 ${sectionType.subheader}`}>
+
+                    <h4
+                      className={`mb-2 font-serif font-bold sm:mb-3 ${sectionType.subheader}`}
+                      style={{ color: MOTIF_FOREST }}
+                    >
                       Request Sent!
                     </h4>
-                    
-                    {/* Message */}
+
                     <div className="space-y-1 sm:space-y-1.5 mb-2 sm:mb-3">
-                      <p className={`text-motif-deep/95 font-medium ${sectionType.text}`}>
-                        We've received your request
+                      <p className={`font-medium ${sectionType.text}`} style={{ color: MOTIF_FOREST }}>
+                        We&apos;ve received your request
                       </p>
-                      <p className={`text-motif-deep/85 ${sectionType.label}`}>
-                        We'll review it and get back to you soon
+                      <p className={sectionType.label} style={{ color: palette.body }}>
+                        We&apos;ll review it and get back to you soon
                       </p>
                     </div>
-                    
-                    {/* Subtle closing indicator */}
+
                     <div className="flex items-center justify-center gap-1 sm:gap-1.5 mt-2 sm:mt-3">
-                      <div className="w-0.5 h-0.5 sm:w-1 sm:h-1 bg-motif-deep/60 rounded-full animate-pulse" />
-                      <p className={`text-motif-deep/70 ${sectionType.label}`}>
+                      <div
+                        className="h-0.5 w-0.5 rounded-full animate-pulse sm:h-1 sm:w-1"
+                        style={{ backgroundColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 55%, transparent)` }}
+                      />
+                      <p className={sectionType.label} style={{ color: palette.body }}>
                         This will close automatically
                       </p>
-                      <div className="w-0.5 h-0.5 sm:w-1 sm:h-1 bg-motif-deep/60 rounded-full animate-pulse" />
+                      <div
+                        className="h-0.5 w-0.5 rounded-full animate-pulse sm:h-1 sm:w-1"
+                        style={{ backgroundColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 55%, transparent)` }}
+                      />
                     </div>
                   </div>
                 </div>

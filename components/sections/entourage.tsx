@@ -3,7 +3,6 @@
 import React from "react"
 import { useState, useEffect, useMemo, useRef } from "react"
 import localFont from "next/font/local"
-import Image from "next/image"
 import { layeredSectionTitleSize, sectionType } from "@/lib/section-typography"
 import { Cinzel } from "next/font/google"
 import { useSiteConfig } from "@/hooks/use-site-config"
@@ -27,112 +26,35 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
-const IVORY = "#fffaf4"
-const CREAM = "#f7f2e8"
-const BURGUNDY = "#51080f"
-const BURGUNDY_MID = "#751a23"
-const BURGUNDY_DEEP = "#3d0810"
-const BURGUNDY_INK = "#5c241c"
-const GOLD = "#c4a265"
-const GOLD_BRIGHT = "#d4af37"
-const CHAMPAGNE = "#e8c547"
-const BODY_ON_DARK = "color-mix(in srgb, #fffaf4 90%, #e8c547 10%)"
-const BODY_ON_CARD = "#6b4a42"
-const GOLD_BORDER = "color-mix(in srgb, #c4a265 55%, #751a23)"
-const GOLD_BORDER_SOFT = "color-mix(in srgb, #c4a265 32%, transparent)"
+const TEXT_WHITE = "#ffffff"
+const TEXT_WHITE_SOFT = "color-mix(in srgb, #ffffff 82%, transparent)"
+const dividerFade = "color-mix(in srgb, #ffffff 42%, transparent)"
 
-const entourageSectionBackground = `
-  radial-gradient(ellipse 90% 55% at 50% 0%, color-mix(in srgb, ${GOLD_BRIGHT} 18%, transparent) 0%, transparent 58%),
-  radial-gradient(ellipse 70% 45% at 8% 92%, color-mix(in srgb, ${BURGUNDY_MID} 35%, transparent) 0%, transparent 52%),
-  radial-gradient(ellipse 65% 40% at 94% 88%, color-mix(in srgb, ${GOLD} 14%, transparent) 0%, transparent 50%),
-  linear-gradient(180deg, ${BURGUNDY_DEEP} 0%, ${BURGUNDY} 42%, ${BURGUNDY_MID} 78%, ${BURGUNDY_DEEP} 100%)
-`.trim()
-
-/** Seamless damask tile (141×308); shifted to gold via CSS filters */
-const DAMASK_TEXTURE = "/textures/damask-burgundy.png"
-const damaskTileBackground = {
-  backgroundImage: `url("${DAMASK_TEXTURE}")`,
-  backgroundRepeat: "repeat",
-  backgroundSize: "clamp(118px, 16vw, 188px) auto",
+const scriptGlow = {
+  textShadow: "0 1px 2px rgba(0, 0, 0, 0.35), 0 0 12px rgba(0, 0, 0, 0.2)",
 } as const
-
-const goldDamaskMotifFilter =
-  "sepia(1) saturate(2.85) hue-rotate(358deg) brightness(1.12) contrast(1.08)"
-
-const goldDamaskSheenFilter =
-  "brightness(0) saturate(100%) invert(84%) sepia(38%) saturate(520%) hue-rotate(358deg) brightness(108%) contrast(96%)"
-
-function EntourageDamaskPattern() {
-  return (
-    <>
-      <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.32] sm:opacity-[0.28] md:opacity-[0.24]"
-        aria-hidden
-        style={{
-          ...damaskTileBackground,
-          filter: goldDamaskMotifFilter,
-          mixBlendMode: "soft-light",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.12] sm:opacity-[0.1]"
-        aria-hidden
-        style={{
-          ...damaskTileBackground,
-          filter: goldDamaskSheenFilter,
-          mixBlendMode: "overlay",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden
-        style={{
-          background: `
-            linear-gradient(180deg, color-mix(in srgb, ${BURGUNDY_DEEP} 55%, transparent) 0%, transparent 22%, transparent 78%, color-mix(in srgb, ${BURGUNDY_DEEP} 50%, transparent) 100%),
-            radial-gradient(ellipse 85% 55% at 50% 45%, transparent 35%, color-mix(in srgb, ${BURGUNDY_DEEP} 38%, transparent) 100%)
-          `,
-        }}
-      />
-    </>
-  )
-}
 
 const palette = {
-  body: BODY_ON_CARD,
-  heading: BURGUNDY_INK,
-  label: BURGUNDY_MID,
-  accent: GOLD,
-} as const
-
-const goldDividerStyle = {
-  background: `linear-gradient(to right, transparent, ${GOLD_BRIGHT}, transparent)`,
-} as const
-
-const goldDividerStyleLeft = {
-  background: `linear-gradient(to left, transparent, ${CHAMPAGNE}, transparent)`,
+  body: TEXT_WHITE,
+  heading: TEXT_WHITE,
+  label: TEXT_WHITE_SOFT,
+  accent: TEXT_WHITE,
 } as const
 
 const dividerLineStyle = {
-  background: `linear-gradient(to right, transparent, color-mix(in srgb, ${GOLD} 65%, ${BURGUNDY_MID}), transparent)`,
+  background: `linear-gradient(to right, transparent, ${dividerFade}, transparent)`,
 } as const
 
-const cardStyle = {
-  background: `linear-gradient(180deg, ${IVORY} 0%, ${CREAM} 48%, ${IVORY} 100%)`,
-  borderColor: GOLD_BORDER,
-  borderWidth: "1px",
-  borderStyle: "solid",
-  boxShadow:
-    "0 18px 42px color-mix(in srgb, #3d0810 42%, transparent), 0 0 0 1px color-mix(in srgb, #c4a265 22%, transparent), inset 0 1px 0 rgb(255 250 244 / 85%)",
+const dividerLineStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${dividerFade}, transparent)`,
 } as const
-
-const BB_MOTIF = "/image/beauty-and-beast.png"
 
 function OutsideDivider() {
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyle} />
-      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: GOLD }} aria-hidden />
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyle} />
+      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: dividerFade }} aria-hidden />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyleLeft} />
     </div>
   )
 }
@@ -225,55 +147,20 @@ function MixedFontText({
   )
 }
 
-function BeautyBeastMotif({
-  className = "",
-  tone = "burgundy",
-  size = "hero",
-}: {
-  className?: string
-  tone?: "burgundy" | "ivory"
-  size?: "hero" | "compact"
-}) {
-  const filter =
-    tone === "ivory"
-      ? "brightness(0) invert(1) drop-shadow(0 0 14px rgba(212, 175, 55, 0.4))"
-      : "brightness(0) saturate(100%) invert(18%) sepia(42%) saturate(1800%) hue-rotate(314deg) brightness(92%) contrast(95%)"
-
-  const sizeClass =
-    size === "compact"
-      ? "w-[min(160px,44vw)] sm:w-[min(180px,32vw)] md:w-[200px]"
-      : "w-[min(220px,52vw)] sm:w-[min(260px,38vw)] md:w-[280px]"
-
-  return (
-    <div className={`pointer-events-none mx-auto ${className}`} aria-hidden>
-      <Image
-        src={BB_MOTIF}
-        alt=""
-        width={640}
-        height={280}
-        sizes={size === "compact" ? "200px" : "(min-width: 768px) 280px, 52vw"}
-        className={`mx-auto h-auto object-contain opacity-[0.92] ${sizeClass}`}
-        style={{ filter }}
-      />
-    </div>
-  )
-}
-
 function CouplePromiseMark() {
   return (
     <div className="mb-4 text-center sm:mb-5 md:mb-6">
-      <BeautyBeastMotif size="compact" className="mb-3 sm:mb-4" />
       <p
         className={`${cinzel.className} text-[0.625rem] font-semibold uppercase tracking-[0.2em] sm:text-[0.6875rem] sm:tracking-[0.24em] md:text-xs md:tracking-[0.28em]`}
-        style={{ color: BURGUNDY_MID }}
+        style={{ color: TEXT_WHITE }}
       >
         Together as one
       </p>
       <p
-        className={`font-goudy-italic mx-auto mt-1.5 max-w-[16rem] ${sectionType.textSnug} sm:mt-2`}
-        style={{ color: BODY_ON_CARD }}
+        className={`font-goudy-italic mx-auto mt-1.5 max-w-[18rem] ${sectionType.textSnug} sm:mt-2`}
+        style={{ color: TEXT_WHITE_SOFT }}
       >
-        A tale as old as time — the beginning of our forever
+        With grateful hearts, we honor those who walk beside us
       </p>
     </div>
   )
@@ -296,8 +183,7 @@ function EntourageTitle() {
         className={`${theSeasons.className} block uppercase leading-[0.9] tracking-[0.04em] min-[400px]:tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.14em]`}
         style={{
           fontSize: "var(--title-size)",
-          color: IVORY,
-          textShadow: "0 2px 14px color-mix(in srgb, #3d0810 75%, transparent)",
+          color: TEXT_WHITE,
         }}
       >
         Wedding Entourage
@@ -307,9 +193,8 @@ function EntourageTitle() {
         className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-1.5 block w-fit max-w-full px-1 leading-[0.88] sm:mt-2 sm:leading-[0.9]`}
         style={{
           fontSize: "var(--script-size)",
-          color: CHAMPAGNE,
-          textShadow:
-            "0 1px 0 color-mix(in srgb, #3d0810 85%, transparent), 0 0 18px color-mix(in srgb, #d4af37 45%, transparent)",
+          color: TEXT_WHITE,
+          ...scriptGlow,
         }}
       >
         standing with us
@@ -612,7 +497,7 @@ export function Entourage() {
     return (
       <h3
         className={`relative ${SECTION_TITLE_CLASS} mb-1.5 sm:mb-2 md:mb-2.5 ${textAlign} ${className} transition-all duration-300`}
-        style={{ color: BURGUNDY_MID }}
+        style={{ color: TEXT_WHITE }}
       >
         {typeof children === "string" ? (
           <MixedFontText
@@ -650,7 +535,7 @@ export function Entourage() {
       >
         <div
           className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 rounded-md"
-          style={{ background: `linear-gradient(to right, transparent, color-mix(in srgb, ${GOLD} 18%, transparent), transparent)` }}
+          style={{ background: `linear-gradient(to right, transparent, ${dividerFade}, transparent)` }}
         />
         <p
           className={`${theSeasons.className} relative ${textAlign} text-balance transition-all duration-300 max-w-full break-words`}
@@ -661,7 +546,7 @@ export function Entourage() {
                   fontSize: "clamp(0.82rem, min(2.5vw, 6.2cqi), 1.3rem)",
                 }
               : {}),
-            color: BURGUNDY_INK,
+            color: TEXT_WHITE,
           }}
           title={displayName.replace(/\+/g, "†")}
         >
@@ -673,7 +558,7 @@ export function Entourage() {
           ) : (
             <span
               className={`${aboveTheBeyond.className} normal-case tracking-normal`}
-              style={{ color: GOLD, fontSize: "1.2em" }}
+              style={{ color: TEXT_WHITE_SOFT, fontSize: "1.2em" }}
             >
               Coming soon
             </span>
@@ -682,7 +567,7 @@ export function Entourage() {
         {showRole && displayRole && (
           <p
             className={`${theSeasons.className} relative mt-0.5 ${textAlign} max-w-full break-words`}
-            style={{ ...roleTitleStyle, color: GOLD }}
+            style={{ ...roleTitleStyle, color: TEXT_WHITE_SOFT }}
             title={displayRole}
           >
             <MixedFontText
@@ -738,30 +623,12 @@ export function Entourage() {
   }
 
   return (
-    <div
+    <section
       ref={sectionRef}
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative isolate w-full overflow-hidden`}
+      id="entourage"
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative w-full overflow-hidden bg-transparent px-3 py-8 sm:px-5 sm:py-10 md:px-6 md:py-12 lg:py-14`}
     >
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        aria-hidden
-        style={{ background: entourageSectionBackground }}
-      />
-      <EntourageDamaskPattern />
-      <section
-        id="entourage"
-        className="relative z-10 w-full overflow-hidden py-8 sm:py-10 md:py-12 lg:py-14"
-      >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.05]"
-          aria-hidden
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 30%, #fff8dc 0.5px, transparent 0.5px), radial-gradient(circle at 70% 60%, #fffaf4 0.5px, transparent 0.5px)",
-            backgroundSize: "120px 120px, 180px 180px",
-          }}
-        />
-        <div className="relative z-20 mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="relative mx-auto w-full max-w-3xl sm:max-w-4xl">
       {/* Section Header */}
       <div className={`relative mx-auto mb-8 max-w-5xl text-center @container/entourage sm:mb-10 md:mb-12 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"}`}>
         <div className="mx-auto mb-4 sm:mb-5 md:mb-6">
@@ -769,9 +636,9 @@ export function Entourage() {
         </div>
         <p
           className={`${cinzel.className} mx-auto max-w-[20rem] px-2 text-[0.6875rem] font-semibold leading-snug tracking-[0.12em] min-[400px]:max-w-none min-[400px]:text-[0.75rem] min-[400px]:tracking-[0.16em] sm:text-[0.9375rem] sm:tracking-[0.2em] md:text-base md:tracking-[0.22em]`}
-          style={{ color: CHAMPAGNE }}
+          style={{ color: TEXT_WHITE }}
         >
-          Our People
+          Our people
         </p>
         <div className="mx-auto mt-3 sm:mt-4 md:mt-5">
           <EntourageTitle />
@@ -779,44 +646,22 @@ export function Entourage() {
 
         <p
           className={`font-goudy-italic mx-auto mt-4 max-w-xl px-2 sm:mt-5 md:mt-6 ${sectionType.textRelaxed}`}
-          style={{ color: BODY_ON_DARK }}
+          style={{ color: TEXT_WHITE_SOFT }}
         >
-          Honoring those who stand with us on our special day
+          Honoring those who stand with us on our wedding day
         </p>
 
         <div className="mt-4 flex items-center justify-center sm:mt-5">
-          <span
-            className="h-px w-16 sm:w-24 md:w-32"
-            style={goldDividerStyle}
-          />
+          <span className="h-px w-16 sm:w-24 md:w-32" style={dividerLineStyle} />
         </div>
       </div>
 
-      {/* Arch container */}
       <div
-        className={`relative mx-auto max-w-3xl pb-2 sm:max-w-4xl @container/entourage-card transition-all duration-1000 delay-300 ${
+        className={`relative @container/entourage-card transition-all duration-1000 delay-300 ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
       >
-        <div className="relative isolate">
-          <div
-            className="pointer-events-none absolute -inset-x-4 -top-6 bottom-1/2 z-0 rounded-full opacity-80 blur-2xl sm:-inset-x-8"
-            aria-hidden
-            style={{
-              background: `radial-gradient(ellipse 80% 70% at 50% 100%, color-mix(in srgb, ${GOLD_BRIGHT} 22%, transparent), transparent 70%)`,
-            }}
-          />
-          <div
-            className="relative z-10 w-full overflow-hidden rounded-t-[min(28rem,50vw)] sm:rounded-t-[min(32rem,45vw)]"
-            style={cardStyle}
-          >
-            <div
-              className="pointer-events-none absolute inset-3 z-20 rounded-t-[inherit] sm:inset-4 md:inset-5"
-              style={{ border: `1px solid ${GOLD_BORDER_SOFT}` }}
-              aria-hidden
-            />
-
-            <div className="relative z-10 px-4 pb-10 pt-8 sm:px-8 sm:pb-12 sm:pt-10 md:px-12 md:pb-14 md:pt-11 lg:px-14">
+            <div className="relative px-1 pb-6 pt-2 sm:px-2 sm:pb-8 md:px-3">
             {isLoading ? (
               <div className="flex items-center justify-center py-24 sm:py-28 md:py-32">
                 <div className="text-center">
@@ -877,7 +722,7 @@ export function Entourage() {
               {entourage.length === 0 && sponsors.length === 0 && (
                 <p
                   className={`${aboveTheBeyond.className} mt-8 text-center sm:mt-10`}
-                  style={{ color: GOLD, fontSize: "clamp(1.6rem, 4vw, 2.25rem)" }}
+                  style={{ color: TEXT_WHITE_SOFT, fontSize: "clamp(1.6rem, 4vw, 2.25rem)" }}
                 >
                   Coming soon
                 </p>
@@ -1500,12 +1345,9 @@ export function Entourage() {
               })}
             </>
             )}
-          </div>
-        </div>
-        </div>
+            </div>
       </div>
         </div>
-      </section>
-    </div>
+    </section>
   )
 }

@@ -5,11 +5,11 @@ import {
 
 export const siteConfig = {
   couple: {
-    bride: "Sunshyne", //Noenyl Bryle M. Gonzaga
-    brideNickname: "Sunshyne", //Ltryl
-    groom: "Brandon", //Ltryl B. Benitez
-    groomNickname: "Brandon",
-    monogram:"/image/beauty-and-beast.png" ,//Ltryl
+    bride: "Roygina Naya", //Noenyl Bryle M. Gonzaga
+    brideNickname: "RG", //Ltryl
+    groom: "John Calvin Lumapguid", //Ltryl B. Benitez
+    groomNickname: "Joking",
+    monogram:"/deco/monogram.png" ,//Ltryl
     backgroundMusic:"/background_music/BEAUTY AND THE BEAST CELLO COVER.mp3"
   },
   googleAPI:{
@@ -25,9 +25,9 @@ export const siteConfig = {
       "https://docs.google.com/forms/d/e/1FAIpQLSfeGlEl4CMXWefdvCw6AOPHFS1ROku_rs-Gbofa2LkVJ0sLGQ/viewform", 
   },
   wedding: {
-    date: "August 14, 2027",
-    time: "9:30 AM",
-    venue: "Davao City",
+    date: "December 2, 2026",
+    time: "2:30 PM",
+    venue: "The National Shrine of St. Joseph",
     tagline: "are getting married!!!!!",
     theme: "Whimsical Spring Minimalist",
     motif: "#FFCA8B, #FFB383, #F6CEC8, #E99997, #C8C29E",
@@ -40,8 +40,8 @@ export const siteConfig = {
   },
   details: {
     rsvp: {
-      deadline: "October 19, 2026",
-      coordinator: "Jonna / Ricky",
+      deadline: "November 19, 2026",
+      coordinator: "Roygina / Joking",
       phone: "to be announced",
     },
   },
@@ -72,27 +72,27 @@ export const siteConfig = {
     // }
   },
   ceremony: {
-    location: "Davao City",
-    venue: "Ayala Westgrove Heights, South Blvd, Silang, 4118 Cavite, Philippines",
-    map: "https://maps.app.goo.gl/yRMLmsfaZwjEWzy36",
-    date: "August 14, 2027",
-    day: "Thursday",
-    time: "9:30 AM",
-    entourageTime: "8:00 AM",
-    guestsTime: "9:00 AM",
-    image: ["/Details/ceremony (1).jpg", "/Details/ceremony (2).jpg","/Details/ceremony3.webp"],
+    location: "The National Shrine of St. Joseph",
+    venue: "P.J. Burgost St. , Mandaue City, Cebu",
+    map: "https://maps.app.goo.gl/FuFkGbZKw5mjPM1u6",
+    date: "December 2, 2026",
+    day: "Wednesday",
+    time: "2:30 PM",
+    entourageTime: "1:00 PM",
+    guestsTime: "1:30 PM",
+    image: ["/location/ceremony.jpg", "/location/ceremony1.png","/location/ceremony2.jpg"],
   },
   reception: {
-    location: "Davao City",
-    venue: "Davao City",
-    map: "https://maps.app.goo.gl/5ydREXRam4A1zcyT9",
-    date: "August 14, 2027",
-    day: "Thursday",
-    time: "12:00 noon",
-    image: ["/Details/reception7.png", "/Details/reception2.png","/Details/reception3.png","/Details/reception4.png","/Details/reception5.png", "/Details/reception6.png"],
+    location: "The Event Space",
+    venue: "f. Cabahug st Panagdait, Mabolo, Cebu City",
+    map: "https://maps.app.goo.gl/EUgcjzhPdoSaSF33A",
+    date: "December 2, 2026",
+    day: "Wednesday",
+    time: "6:00 PM",
+    image: ["/location/location.jpg", "/location/location1.jpg","/location/location2.jpg"],
   },
   dressCode: {
-    theme: "Whimsical Spring Minimalist",
+    theme: "Forest Green & Burgundy Rustic Elegance",
     sponsors: {
       title: "Sponsors",
       ninang: {
@@ -166,22 +166,22 @@ Now, as they prepare to say yes before God and the people they love most, Cather
   playlist: {
     title: "A Playlist from our hearts",
     subtitle: "Songs that have been part of our journey together",
-    playlistName: "Paul and Ana Wedding",
+    playlistName: "Roygina and Joking Wedding",
     embedUrl:
     //https://open.spotify.com/embed/playlist/2AhKS56CXqBWMYYNrnWrsR?utm_source=generator&si=2beaa29421e94943
-      "https://open.spotify.com/embed/playlist/2AhKS56CXqBWMYYNrnWrsR?utm_source=generator&theme=0&si=2beaa29421e94943",
-    spotifyUrl: "https://open.spotify.com/playlist/2AhKS56CXqBWMYYNrnWrsR",
+      "https://open.spotify.com/embed/playlist/5UlfWw7RyW2f7EkUJqKomp?utm_source=generator&si=b8c6d319057d4655",
+    spotifyUrl: "https://open.spotify.com/embed/playlist/5UlfWw7RyW2f7EkUJqKomp",
   },
   snapShare: {
     googleDriveLink:
       "https://drive.google.com/drive/folders/1XWGl7DCog_VTfCOCMz4Sp-7LXTD27ak1?usp=sharing",
     albumQR: "/QR/AlbumQR.png",
-    hashtag: ["#Jonna&RickyInTime"],
+    hashtag: ["#Roygina&JokingInTime"],
     instructions: "Please scan this QR Code and upload the photos and videos you have taken during our wedding reception. We are delighted to see your snaps too!",
   },
   accommodation: {
     coordinator: {
-      name: "Jonna / Ricky",
+      name: "Roygina / Joking",
       phone: "to be announced",
     },
     hotels: [

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useCallback, useEffect, type ReactNode } from "react"
+import { useRef, useState, useCallback, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -29,60 +29,45 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
+const TEXT_WHITE = "#ffffff"
+const TEXT_WHITE_SOFT = "color-mix(in srgb, #ffffff 82%, transparent)"
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_FOREST = "#052312"
 const IVORY = "#fffaf4"
-const GOLD = "var(--color-welcome-gold)"
-const NAVY = "var(--color-welcome-navy)"
-const BODY = "var(--color-welcome-text)"
-const NAV_GOLD =
-  "linear-gradient(180deg, #E8D5A3 0%, #CDB072 52%, #C4A265 100%)"
+const MOTIF_CREAM = "#f4f0e8"
+const TEXT_ON_BURGUNDY = IVORY
 
-const palette = {
-  body: BODY,
-  heading: NAVY,
-  label: GOLD,
-  accent: GOLD,
+const dividerFade = "color-mix(in srgb, #ffffff 42%, transparent)"
+const containerBorder = `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`
+const inputBorderIdle = `color-mix(in srgb, ${MOTIF_BURGUNDY} 22%, transparent)`
+const inputBg = `color-mix(in srgb, ${IVORY} 96%, ${MOTIF_CREAM})`
+
+const scriptGlow = {
+  textShadow: "0 1px 2px rgba(0, 0, 0, 0.35), 0 0 12px rgba(0, 0, 0, 0.2)",
 } as const
 
-const goldDividerStyle = {
-  background: "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
+const dividerLineStyle = {
+  background: `linear-gradient(to right, transparent, ${dividerFade}, transparent)`,
 } as const
 
-const goldDividerStyleLeft = {
-  background: "linear-gradient(to left, transparent, var(--color-welcome-gold), transparent)",
+const dividerLineStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${dividerFade}, transparent)`,
 } as const
 
-const silkTitleShadow =
-  "0 1px 0 rgb(42 34 28 / 42%), 0 2px 10px rgb(42 34 28 / 38%), 0 8px 28px rgb(42 34 28 / 28%)"
-const silkScriptShadow =
-  "0 1px 0 rgb(42 34 28 / 35%), 0 2px 12px rgb(42 34 28 / 32%), 0 0 18px rgb(232 213 163 / 35%)"
-const silkBodyShadow =
-  "0 1px 1px rgb(42 34 28 / 45%), 0 2px 10px rgb(42 34 28 / 32%)"
-
-const silkGlowStyle = {
-  background:
-    "radial-gradient(ellipse at center, rgb(94 81 68 / 34%) 0%, rgb(94 81 68 / 12%) 46%, transparent 72%)",
+/** Motif palette — used inside form/message containers only */
+const containerPalette = {
+  body: `color-mix(in srgb, ${MOTIF_FOREST} 78%, #4a5c4e)`,
+  heading: MOTIF_FOREST,
+  label: MOTIF_BURGUNDY,
+  accent: MOTIF_BURGUNDY,
 } as const
 
-function SilkTextGlow({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={`relative ${className}`}>
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[140%] w-[min(100%,28rem)] -translate-x-1/2 -translate-y-1/2 blur-2xl"
-        style={silkGlowStyle}
-        aria-hidden
-      />
-      <div className="relative z-10">{children}</div>
-    </div>
-  )
-}
-
-const cardStyle = {
+const formShellStyle = {
   background: IVORY,
   borderWidth: "1px",
   borderStyle: "solid",
-  borderColor: "color-mix(in srgb, var(--color-welcome-gold) 38%, transparent)",
-  boxShadow:
-    "0 10px 28px color-mix(in srgb, var(--color-welcome-gold) 12%, transparent), inset 0 1px 0 rgb(255 250 244 / 70%)",
+  borderColor: containerBorder,
+  boxShadow: "0 10px 28px color-mix(in srgb, #052312 10%, transparent)",
 } as const
 
 interface Message {
@@ -99,9 +84,9 @@ interface MessageFormProps {
 function OutsideDivider() {
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyle} />
-      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: GOLD }} aria-hidden />
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyle} />
+      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: dividerFade }} aria-hidden />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyleLeft} />
     </div>
   )
 }
@@ -123,8 +108,7 @@ function MessagesTitle() {
         className={`${theSeasons.className} block uppercase leading-[0.9] tracking-[0.04em] min-[400px]:tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.14em]`}
         style={{
           fontSize: "var(--title-size)",
-          color: IVORY,
-          textShadow: silkTitleShadow,
+          color: TEXT_WHITE,
         }}
       >
         Love Notes
@@ -134,8 +118,8 @@ function MessagesTitle() {
         className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-1.5 block w-fit max-w-full px-1 leading-[0.88] sm:mt-2 sm:leading-[0.9]`}
         style={{
           fontSize: "var(--script-size)",
-          color: "#F3E6C0",
-          textShadow: silkScriptShadow,
+          color: TEXT_WHITE,
+          ...scriptGlow,
         }}
       >
         and prayers
@@ -210,13 +194,11 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
   }
 
   const inputBorder = (field: string) =>
-    focusedField === field
-      ? palette.accent
-      : "color-mix(in srgb, var(--color-welcome-gold) 32%, transparent)"
+    focusedField === field ? MOTIF_BURGUNDY : inputBorderIdle
 
   const inputClass = (field: string) =>
-    `message-form-input w-full rounded-lg border bg-[#fffaf4] px-3 py-2 font-goudy-italic ${sectionType.text} transition-all duration-300 focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-welcome-gold)_28%,transparent)] sm:px-4 sm:py-2.5 md:py-3 ${
-      focusedField === field ? "shadow-md" : ""
+    `message-form-input w-full rounded-lg border px-3 py-2 font-goudy-italic ${sectionType.text} transition-all duration-300 focus:ring-2 focus:ring-[color-mix(in_srgb,#531314_18%,transparent)] sm:px-4 sm:py-2.5 md:py-3 ${
+      focusedField === field ? "shadow-[0_4px_14px_color-mix(in_srgb,#531314_12%,transparent)]" : ""
     }`
 
   return (
@@ -224,7 +206,7 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
       <style>{`
         .message-form-input::placeholder,
         .message-form-textarea::placeholder {
-          color: color-mix(in srgb, var(--color-welcome-text) 55%, transparent) !important;
+          color: color-mix(in srgb, #052312 42%, transparent) !important;
           opacity: 1 !important;
         }
       `}</style>
@@ -233,21 +215,16 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
         className={`relative w-full overflow-hidden rounded-[1.85rem] border transition-all duration-500 ${
           isFocused ? "scale-[1.01]" : ""
         } ${isSubmitted ? "animate-bounce" : ""}`}
-        style={cardStyle}
+        style={formShellStyle}
       >
-        <div
-          className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-white/35 via-white/8 to-transparent"
-          aria-hidden
-        />
-
         {isSubmitted && (
           <div
-            className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"
-            style={{ backgroundColor: IVORY }}
+            className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none backdrop-blur-[2px]"
+            style={{ backgroundColor: "color-mix(in srgb, #fffaf4 88%, transparent)" }}
           >
             <p
-              className={`${cinzel.className} font-semibold ${sectionType.subheader}`}
-              style={{ color: palette.heading }}
+              className={`${cinzel.className} font-semibold uppercase tracking-[0.14em] ${sectionType.subheader}`}
+              style={{ color: containerPalette.accent }}
             >
               Sent!
             </p>
@@ -258,11 +235,11 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
           <div className="mb-4 text-center sm:mb-5 md:mb-6">
             <h3
               className={`${theSeasons.className} ${sectionType.subheader} mb-1.5 font-semibold tracking-[0.08em] uppercase`}
-              style={{ color: NAVY }}
+              style={{ color: containerPalette.heading }}
             >
               Share Your Love
             </h3>
-            <p className={`font-goudy-italic ${sectionType.text}`} style={{ color: BODY }}>
+            <p className={`font-goudy-italic ${sectionType.text}`} style={{ color: containerPalette.body }}>
               Leave a note for {coupleDisplayName} to read and keep.
             </p>
           </div>
@@ -277,7 +254,7 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
             <div className="space-y-1.5 sm:space-y-2">
               <label
                 className={`${cinzel.className} ${sectionType.label} font-semibold uppercase tracking-[0.16em]`}
-                style={{ color: GOLD }}
+                style={{ color: containerPalette.label }}
               >
                 Your Name
               </label>
@@ -291,8 +268,8 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
                 placeholder="Full name"
                 className={inputClass("name")}
                 style={{
-                  color: NAVY,
-                  backgroundColor: IVORY,
+                  color: containerPalette.heading,
+                  backgroundColor: inputBg,
                   borderColor: inputBorder("name"),
                 }}
               />
@@ -302,14 +279,14 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
               <div className="flex items-center justify-between gap-2">
                 <label
                   className={`${cinzel.className} ${sectionType.label} font-semibold uppercase tracking-[0.16em]`}
-                  style={{ color: GOLD }}
+                  style={{ color: containerPalette.label }}
                 >
                   Your Message
                 </label>
                 {messageValue && (
                   <span
-                    className={`${sectionType.label} ${messageValue.length > 500 ? "text-red-500" : ""}`}
-                    style={messageValue.length <= 500 ? { color: palette.accent } : undefined}
+                    className={`${sectionType.label} ${messageValue.length > 500 ? "text-red-600" : ""}`}
+                    style={messageValue.length <= 500 ? { color: containerPalette.accent } : undefined}
                   >
                     {messageValue.length}/500
                   </span>
@@ -329,8 +306,8 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
                 placeholder={`Write your wishes, prayer, or kind words for ${coupleDisplayName}...`}
                 className={`message-form-textarea ${inputClass("message")} min-h-[90px] resize-none placeholder:leading-relaxed sm:min-h-[110px] md:min-h-[130px]`}
                 style={{
-                  color: NAVY,
-                  backgroundColor: IVORY,
+                  color: containerPalette.heading,
+                  backgroundColor: inputBg,
                   borderColor: inputBorder("message"),
                 }}
               />
@@ -339,11 +316,11 @@ function MessageForm({ onSuccess, onMessageSent }: MessageFormProps) {
             <Button
               type="submit"
               disabled={isSubmitting || !nameValue.trim() || !messageValue.trim()}
-              className={`${cinzel.className} group relative w-full rounded-full border px-5 py-2.5 ${sectionType.label} font-semibold uppercase tracking-[0.16em] shadow-[0_8px_18px_color-mix(in_srgb,var(--color-welcome-gold)_22%,transparent)] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-70 disabled:transform-none sm:py-3 sm:tracking-[0.18em]`}
+              className={`${cinzel.className} group relative w-full rounded-full border px-5 py-2.5 ${sectionType.label} font-semibold uppercase tracking-[0.16em] shadow-[0_8px_18px_color-mix(in_srgb,#531314_35%,transparent)] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-70 disabled:transform-none sm:py-3 sm:tracking-[0.18em]`}
               style={{
-                background: NAV_GOLD,
-                borderColor: "transparent",
-                color: IVORY,
+                backgroundColor: MOTIF_BURGUNDY,
+                borderColor: `color-mix(in srgb, ${MOTIF_FOREST} 32%, transparent)`,
+                color: TEXT_ON_BURGUNDY,
               }}
             >
               {isSubmitting ? (
@@ -419,16 +396,12 @@ export function Messages() {
   }, [fetchMessages])
 
   return (
-    <div
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative w-full`}
-    >
     <section
       id="messages"
-      className="relative z-10 pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-12 md:pb-12 lg:pt-14 lg:pb-14"
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative z-10 w-full bg-transparent px-3 pt-8 pb-8 sm:px-5 sm:pt-10 sm:pb-10 md:px-6 md:pt-12 md:pb-12 lg:pt-14 lg:pb-14`}
     >
-      <div className="relative z-10 mx-auto max-w-6xl px-3 @container/messages sm:px-4 md:px-6 lg:px-8">
-        {/* Header — outside container */}
-        <SilkTextGlow className="mb-6 text-center sm:mb-8 md:mb-10">
+      <div className="relative mx-auto max-w-4xl @container/messages">
+        <div className="mb-6 text-center sm:mb-8 md:mb-10">
           <div className="mx-auto mb-5 sm:mb-6 md:mb-7">
             <OutsideDivider />
           </div>
@@ -437,14 +410,14 @@ export function Messages() {
           </div>
           <p
             className={`font-goudy-italic mx-auto mt-4 max-w-2xl px-2 sm:mt-5 md:mt-6 ${sectionType.textRelaxed}`}
-            style={{ color: IVORY, textShadow: silkBodyShadow }}
+            style={{ color: TEXT_WHITE_SOFT }}
           >
             Share a short note, wish, or prayer for {coupleDisplayName}. Every message becomes part of our story.
           </p>
           <div className="mt-4 flex items-center justify-center sm:mt-5">
-            <span className="h-px w-16 sm:w-24 md:w-32" style={goldDividerStyle} />
+            <span className="h-px w-16 sm:w-24 md:w-32" style={dividerLineStyle} />
           </div>
-        </SilkTextGlow>
+        </div>
 
         {/* Form container */}
         <div className="mb-6 flex justify-center sm:mb-8 md:mb-10">
@@ -454,33 +427,29 @@ export function Messages() {
         </div>
 
      
-         <div className="relative mx-auto max-w-4xl pb-2 sm:pb-3">
-          <SilkTextGlow className="mb-4 text-center sm:mb-6 md:mb-8">
+        <div className="relative mx-auto max-w-3xl pb-2 sm:pb-3">
+          <div className="mb-4 text-center sm:mb-6 md:mb-8">
             <h3
               className={`${theSeasons.className} mb-1.5 font-semibold tracking-[0.08em] uppercase sm:mb-2 ${sectionType.subheader}`}
-              style={{ color: IVORY, textShadow: silkTitleShadow }}
+              style={{ color: TEXT_WHITE }}
             >
               Messages from Loved Ones
             </h3>
-            <p
-              className={`font-goudy-italic ${sectionType.text}`}
-              style={{ color: "#F3E6C0", textShadow: silkBodyShadow }}
-            >
+            <p className={`font-goudy-italic ${sectionType.text}`} style={{ color: TEXT_WHITE_SOFT }}>
               Warm words from family and friends
             </p>
             <div className="mt-4 flex items-center justify-center sm:mt-5">
-              <span className="h-px w-16 sm:w-24 md:w-32" style={goldDividerStyle} />
+              <span className="h-px w-16 sm:w-24 md:w-32" style={dividerLineStyle} />
             </div>
-          </SilkTextGlow>
+          </div>
 
           <MessageWallDisplay
             messages={messages}
             loading={loading && messages.length === 0}
             freshKey={freshKey}
           />
-        </div>  
+        </div>
       </div>
     </section>
-    </div>
   )
 }

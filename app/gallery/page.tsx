@@ -1,7 +1,7 @@
 import MasonryGallery from "@/components/masonry-gallery"
 import { fetchGalleryImages } from "@/lib/fetch-gallery-images"
+import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { layeredSectionTitleSize, sectionType } from "@/lib/section-typography"
-import { sectionBackground } from "@/lib/section-background"
 import localFont from "next/font/local"
 import { Cinzel } from "next/font/google"
 import { Camera } from "lucide-react"
@@ -23,18 +23,9 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
-const GOLD = "var(--color-welcome-gold)"
-const NAVY = "var(--color-welcome-navy)"
-const SCRIPT = "var(--color-welcome-green)"
-const BODY = "var(--color-welcome-text)"
-
-const goldDividerStyle = {
-  background: "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
-} as const
-
-const goldDividerStyleLeft = {
-  background: "linear-gradient(to left, transparent, var(--color-welcome-gold), transparent)",
-} as const
+const TEXT_WHITE = "#ffffff"
+const IVORY = "#fffaf4"
+const dividerFadeLight = "color-mix(in srgb, #ffffff 42%, transparent)"
 
 const CORNER_DECO_CLASS =
   "block h-auto w-auto max-w-[120px] sm:max-w-[180px] md:max-w-[260px] lg:max-w-[320px] xl:max-w-[380px] select-none"
@@ -44,9 +35,13 @@ export const dynamic = "force-static"
 function OutsideDivider() {
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyle} />
-      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: GOLD }} aria-hidden />
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={{ background: dividerFadeLight }} aria-hidden />
+      <span
+        className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1"
+        style={{ background: dividerFadeLight }}
+        aria-hidden
+      />
+      <span className="h-px w-6 sm:w-10" style={{ background: dividerFadeLight }} aria-hidden />
     </div>
   )
 }
@@ -68,7 +63,8 @@ function GalleryTitle() {
         className={`${theSeasons.className} block uppercase leading-[0.9] tracking-[0.04em] min-[400px]:tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.14em]`}
         style={{
           fontSize: "var(--title-size)",
-          color: NAVY,
+          color: TEXT_WHITE,
+          textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
         }}
       >
         Gallery
@@ -78,9 +74,8 @@ function GalleryTitle() {
         className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-1.5 block w-fit max-w-full px-1 leading-[0.88] sm:mt-2 sm:leading-[0.9]`}
         style={{
           fontSize: "var(--script-size)",
-          color: SCRIPT,
-          textShadow:
-            "0 1px 0 color-mix(in srgb, var(--color-welcome-bg) 95%, white), 0 0 10px color-mix(in srgb, var(--color-welcome-bg) 65%, white)",
+          color: IVORY,
+          textShadow: "0 1px 12px rgba(0, 0, 0, 0.55)",
         }}
       >
         our favorite moments
@@ -106,9 +101,13 @@ export default async function GalleryPage() {
 
   return (
     <main
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative min-h-screen overflow-x-hidden`}
-      style={{ background: sectionBackground }}
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative min-h-screen overflow-x-hidden bg-[#0a1410]`}
     >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={cornerTextureBackgroundStyle}
+        aria-hidden
+      />
       <div className="pointer-events-none absolute left-0 top-0 z-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -153,7 +152,10 @@ export default async function GalleryPage() {
           </div>
           <p
             className={`${cinzel.className} mx-auto mt-4 max-w-[20rem] px-2 text-[0.6875rem] font-semibold leading-snug tracking-[0.12em] min-[400px]:max-w-none min-[400px]:text-[0.75rem] min-[400px]:tracking-[0.16em] sm:mt-6 sm:text-[0.9375rem] sm:tracking-[0.2em] md:text-base md:tracking-[0.22em]`}
-            style={{ color: GOLD }}
+            style={{
+              color: "color-mix(in srgb, #ffffff 88%, transparent)",
+              textShadow: "0 1px 8px rgba(0, 0, 0, 0.45)",
+            }}
           >
             Our Moments
           </p>
@@ -162,20 +164,23 @@ export default async function GalleryPage() {
           </div>
           <p
             className={`font-goudy-italic mx-auto mt-4 max-w-xl px-2 sm:mt-5 md:mt-6 ${sectionType.textRelaxed}`}
-            style={{ color: BODY }}
+            style={{
+              color: "color-mix(in srgb, #ffffff 90%, transparent)",
+              textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
+            }}
           >
             From our first chapter to this beautiful season of commitment — every moment has been a
             testament to love, faith, and grace.
           </p>
 
           <div className="mt-4 flex items-center justify-center gap-1.5 sm:mt-5">
-            <span className="h-px w-8 sm:w-12 md:w-16" style={goldDividerStyle} />
+            <span className="h-px w-8 sm:w-12 md:w-16" style={{ background: dividerFadeLight }} />
             <Camera
               className="h-3.5 w-3.5 sm:h-4 sm:w-4"
-              style={{ color: GOLD }}
+              style={{ color: TEXT_WHITE }}
               aria-hidden
             />
-            <span className="h-px w-8 sm:w-12 md:w-16" style={goldDividerStyleLeft} />
+            <span className="h-px w-8 sm:w-12 md:w-16" style={{ background: dividerFadeLight }} />
           </div>
         </div>
 
@@ -184,7 +189,10 @@ export default async function GalleryPage() {
         ) : (
           <p
             className={`text-center font-goudy-italic ${sectionType.text}`}
-            style={{ color: BODY }}
+            style={{
+              color: "color-mix(in srgb, #ffffff 90%, transparent)",
+              textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
+            }}
           >
             No images to display.
           </p>

@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from "motion/react"
 import {
   Heart,
   Check,
-  X,
   Sparkles,
 } from "lucide-react"
 import localFont from "next/font/local"
@@ -18,15 +17,24 @@ import { Hero as InvitationHero } from "@/components/loader/Hero"
 import { LoadingScreen } from "@/components/loader/LoadingScreen"
 import { getRoleSingular } from "@/lib/proposal-roles"
 import { parseWeddingDate } from "@/lib/wedding-date"
+import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { sectionType, welcomeTitleSize } from "@/lib/section-typography"
 import { siteConfig as defaultSiteConfig } from "@/content/site"
 import type { ProposalRole, ProposalResponse } from "@/lib/proposal-types"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 const Silk = dynamic(() => import("@/components/silk"), { ssr: false })
 
+const enableDecor = process.env.NEXT_PUBLIC_ENABLE_DECOR !== "false"
+const SILK_FALLBACK = "#780008"
+
 const proposalEntryEase = [0.22, 1, 0.36, 1] as const
 const CINEMATIC_ENTRY_MS = 3000
-const BEIGE = "#f6efe4"
 
 const cinzel = Cinzel({
   subsets: ["latin"],
@@ -51,45 +59,45 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_FOREST = "#052312"
 const IVORY = "#fffaf4"
-const CHAMPAGNE = "#E8D5A3"
-const GOLD_BRIGHT = "#d4af37"
-const INK = "#2a221c"
-const CREAM = "#3d3228"
-const LABEL_GOLD = "#8a6414"
-const GOLD_BORDER = "color-mix(in srgb, #d4af37 45%, transparent)"
-const GOLD_BORDER_SOFT = "color-mix(in srgb, #d4af37 28%, transparent)"
+const MOTIF_CREAM = "#f4f0e8"
+const CARD_IVORY = `color-mix(in srgb, ${IVORY} 94%, ${MOTIF_CREAM})`
+const INK = MOTIF_FOREST
+const TEXT_WHITE = "#ffffff"
+const TEXT_WHITE_SOFT = "color-mix(in srgb, #ffffff 82%, transparent)"
+const CHAMPAGNE = "#f5e6a8"
+const dividerFadeLight = "color-mix(in srgb, #ffffff 42%, transparent)"
+const BORDER_SOFT = `color-mix(in srgb, ${MOTIF_BURGUNDY} 22%, transparent)`
+const BORDER_MOTIF = `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`
+const BORDER_CARD = "color-mix(in srgb, #ffffff 22%, transparent)"
+const INNER_SURFACE = `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`
+const GLASS_ON_TEXTURE = "color-mix(in srgb, #ffffff 8%, transparent)"
 
-const goldGradientText: CSSProperties = {
-  background:
-    "linear-gradient(168deg, #7a5810 0%, #5c400c 42%, #3d2a06 100%)",
-  WebkitBackgroundClip: "text",
-  backgroundClip: "text",
-  color: "transparent",
+const cardHeadingText: CSSProperties = {
+  color: TEXT_WHITE,
 }
 
 const palette = {
-  body: CREAM,
-  bodySoft: "#4a3c30",
-  heading: INK,
-  label: LABEL_GOLD,
-  accent: LABEL_GOLD,
+  body: TEXT_WHITE_SOFT,
+  bodySoft: "color-mix(in srgb, #ffffff 68%, transparent)",
+  heading: TEXT_WHITE,
+  label: "color-mix(in srgb, #fffaf4 92%, white)",
+  accent: CHAMPAGNE,
   script: CHAMPAGNE,
 } as const
 
-const BORDER_SOFT = GOLD_BORDER_SOFT
-const INNER_SURFACE = "#efe4d2"
-
 const ambientGlowStyle = {
-  background: `radial-gradient(ellipse 80% 65% at 50% 50%, color-mix(in srgb, ${GOLD_BRIGHT} 28%, transparent), transparent 68%)`,
+  background: `radial-gradient(ellipse 80% 65% at 50% 50%, color-mix(in srgb, ${MOTIF_BURGUNDY} 18%, transparent), transparent 68%)`,
 } as const
 
 const dividerLineStyle = {
-  background: "linear-gradient(to right, transparent, rgb(212 175 55 / 70%), transparent)",
+  background: `linear-gradient(to right, transparent, ${dividerFadeLight}, transparent)`,
 } as const
 
 const coupleLabelLineStyle = {
-  background: "linear-gradient(to right, transparent, rgb(212 175 55 / 70%))",
+  background: `linear-gradient(to right, transparent, ${dividerFadeLight})`,
 } as const
 
 const nameStyle: CSSProperties = {
@@ -98,28 +106,36 @@ const nameStyle: CSSProperties = {
 }
 
 const cardStyle: CSSProperties = {
-  background: BEIGE,
-  borderColor: GOLD_BORDER,
+  ...cornerTextureBackgroundStyle,
+  borderColor: BORDER_CARD,
   borderWidth: "1px",
   borderStyle: "solid",
   boxShadow:
-    "0 18px 48px rgb(42 34 28 / 18%), inset 0 1px 0 rgb(255 250 244 / 80%)",
+    "0 18px 48px color-mix(in srgb, #000 35%, transparent), inset 0 1px 0 color-mix(in srgb, white 12%, transparent)",
 }
 
 const primaryBtnStyle: CSSProperties = {
   fontWeight: 600,
-  background: "linear-gradient(180deg, #fff8dc 0%, #f5d76e 42%, #c9a227 100%)",
-  borderColor: "color-mix(in srgb, #fff8dc 60%, #d4af37)",
-  color: INK,
-  boxShadow: "0 8px 22px color-mix(in srgb, #d4af37 34%, transparent)",
+  background: `linear-gradient(180deg, color-mix(in srgb, ${MOTIF_BURGUNDY} 90%, #000) 0%, ${MOTIF_BURGUNDY} 52%, color-mix(in srgb, ${MOTIF_BURGUNDY} 88%, #000) 100%)`,
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 55%, transparent)`,
+  color: IVORY,
+  boxShadow: "0 8px 22px color-mix(in srgb, #531314 28%, transparent)",
 }
 
 const secondaryBtnStyle: CSSProperties = {
   fontWeight: 600,
-  color: INK,
-  backgroundColor: BEIGE,
-  borderColor: GOLD_BORDER,
-  boxShadow: "0 0 24px color-mix(in srgb, #d4af37 16%, transparent)",
+  color: TEXT_WHITE,
+  backgroundColor: "color-mix(in srgb, #ffffff 8%, transparent)",
+  borderColor: "color-mix(in srgb, #ffffff 28%, transparent)",
+  boxShadow: "0 4px 18px color-mix(in srgb, #000 22%, transparent)",
+}
+
+const declineConfirmBtnStyle: CSSProperties = {
+  fontWeight: 600,
+  color: "color-mix(in srgb, #ffffff 72%, transparent)",
+  backgroundColor: "color-mix(in srgb, #ffffff 6%, transparent)",
+  borderColor: "color-mix(in srgb, #ffffff 20%, transparent)",
+  boxShadow: "none",
 }
 
 const labelStyle = (color: string, extra?: CSSProperties): CSSProperties => ({
@@ -129,15 +145,35 @@ const labelStyle = (color: string, extra?: CSSProperties): CSSProperties => ({
   ...extra,
 })
 
+function VenueDivider() {
+  return (
+    <div className="mt-3 flex w-full items-center justify-center gap-1.5 sm:mt-3.5">
+      <span className="h-px w-12 sm:w-16" style={{ background: dividerFadeLight }} aria-hidden />
+      <span
+        className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1"
+        style={{ backgroundColor: dividerFadeLight }}
+        aria-hidden
+      />
+      <span className="h-px w-12 sm:w-16" style={{ background: dividerFadeLight }} aria-hidden />
+    </div>
+  )
+}
+
 function OrnamentalDivider({ compact = false }: { compact?: boolean }) {
   return (
     <div
       className={`mx-auto flex items-center justify-center gap-2 ${compact ? "max-w-[10rem]" : "max-w-xs sm:max-w-sm"}`}
       aria-hidden
     >
-      <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#d4af37]/70 to-transparent" />
-      <span className="h-1 w-1 rotate-45 bg-[#d4af37]" />
-      <span className="h-px flex-1 bg-gradient-to-l from-transparent via-[#d4af37]/70 to-transparent" />
+      <span
+        className="h-px flex-1"
+        style={{ background: `linear-gradient(to right, transparent, ${dividerFadeLight}, transparent)` }}
+      />
+      <span className="h-1 w-1 rotate-45" style={{ backgroundColor: dividerFadeLight }} />
+      <span
+        className="h-px flex-1"
+        style={{ background: `linear-gradient(to left, transparent, ${dividerFadeLight}, transparent)` }}
+      />
     </div>
   )
 }
@@ -148,12 +184,12 @@ function CoupleLabel({ groom, bride }: { groom: string; bride: string }) {
       <span className="h-px w-5 sm:w-7 md:w-9" style={coupleLabelLineStyle} aria-hidden />
       <p
         className={`${theSeasons.className} shrink-0 py-0.5 text-[clamp(0.95rem,3.6vw,1.25rem)] uppercase leading-snug tracking-[0.14em] sm:tracking-[0.18em]`}
-        style={{ color: INK }}
+        style={{ color: TEXT_WHITE }}
       >
         {groom}
         <span
           className={`${aboveTheBeyond.className} mx-2 inline-block text-[clamp(1.15rem,4.2vw,1.5rem)] normal-case tracking-normal`}
-          style={{ color: "#8a6840", verticalAlign: "middle" }}
+          style={{ color: CHAMPAGNE, verticalAlign: "middle" }}
           aria-hidden
         >
           &
@@ -163,7 +199,7 @@ function CoupleLabel({ groom, bride }: { groom: string; bride: string }) {
       <span
         className="h-px w-5 sm:w-7 md:w-9"
         style={{
-          background: "linear-gradient(to left, transparent, rgb(212 175 55 / 70%))",
+          background: `linear-gradient(to left, transparent, ${dividerFadeLight})`,
         }}
         aria-hidden
       />
@@ -201,7 +237,7 @@ function LayeredProposalTitle({
         className={`${theSeasons.className} block uppercase leading-[0.92] tracking-[0.05em] min-[400px]:tracking-[0.08em] sm:leading-[0.94] sm:tracking-[0.12em] md:tracking-[0.14em]`}
         style={{
           fontSize: "var(--welcome-size)",
-          ...goldGradientText,
+          ...cardHeadingText,
         }}
       >
         {main}
@@ -212,7 +248,8 @@ function LayeredProposalTitle({
         style={{
           marginTop: "var(--script-overlap)",
           fontSize: "var(--script-size)",
-          color: "#5c4014",
+          color: CHAMPAGNE,
+          textShadow: "0 1px 12px rgba(0, 0, 0, 0.35)",
         }}
       >
         {script}
@@ -305,117 +342,92 @@ function ProposalDateBlock({
   month,
   dayShort,
   dayNumber,
-  time,
+  timeStr,
   year,
+  venueUpper,
 }: {
   month: string
   dayShort: string
   dayNumber: string
-  time: string
+  timeStr: string
   year: string
+  venueUpper?: string
 }) {
-  const dateLineStyle = {
-    background: "linear-gradient(to right, transparent, rgb(212 175 55 / 70%), transparent)",
-  } as const
+  const lineMuted = dividerFadeLight
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <div className="flex flex-col items-center gap-1.5 sm:gap-2.5 md:gap-3">
-        <span
-          className={`${theSeasons.className} text-[clamp(1.15rem,4.5vw,1.85rem)] uppercase leading-none tracking-[0.12em] sm:tracking-[0.16em]`}
-          style={{
-            color: INK,
-          }}
-        >
-          {month}
-        </span>
+    <div
+      className={`${cinzel.className} mx-auto flex w-full max-w-md flex-col items-center gap-1.5 font-bold sm:gap-2`}
+      style={{ color: TEXT_WHITE }}
+    >
+      <span className="text-[0.62rem] uppercase tracking-[0.38em] sm:text-[0.68rem] sm:tracking-[0.44em]">
+        {month}
+      </span>
 
-        <div className="flex w-full items-center gap-2 sm:gap-4 md:gap-5">
-          <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-2.5">
-            <span className="h-[0.5px] flex-1" style={dateLineStyle} aria-hidden />
-            <span
-              className={`${cinzel.className} text-[0.6rem] font-light uppercase tracking-[0.3em] sm:text-[0.7rem] sm:tracking-[0.4em] md:text-xs`}
-              style={{ color: palette.heading }}
-            >
-              {dayShort}
-            </span>
-            <span
-              className="h-[0.5px] w-6 sm:w-8 md:w-10"
-              style={dateLineStyle}
-              aria-hidden
-            />
-          </div>
-
-          <div className="relative flex items-center justify-center px-3 sm:px-4 md:px-5">
-            <span
-              aria-hidden
-              className="absolute inset-0 mx-auto h-[70%] max-h-[180px] w-[100px] rounded-full opacity-80 blur-[28px] sm:w-[140px] md:w-[170px]"
-              style={{
-                background: `radial-gradient(ellipse 80% 65% at 50% 50%, color-mix(in srgb, ${GOLD_BRIGHT} 42%, transparent), transparent 68%)`,
-              }}
-            />
-            <span
-              className={`${playfair.className} relative text-[clamp(3rem,16vw,6rem)] font-semibold italic leading-[0.92] tabular-nums tracking-[0.01em]`}
-              style={goldGradientText}
-            >
-              {dayNumber}
-            </span>
-          </div>
-
-          <div className="flex flex-1 items-center gap-1.5 sm:gap-2.5">
-            <span
-              className="h-[0.5px] w-6 sm:w-8 md:w-10"
-              style={dateLineStyle}
-              aria-hidden
-            />
-            <span
-              className={`${cinzel.className} text-[0.6rem] font-light uppercase tracking-[0.3em] sm:text-[0.7rem] sm:tracking-[0.4em] md:text-xs`}
-              style={{ color: palette.heading }}
-            >
-              {time.split(",")[0]}
-            </span>
-            <span className="h-[0.5px] flex-1" style={dateLineStyle} aria-hidden />
-          </div>
+      <div className="flex w-full items-center gap-1.5 sm:gap-3">
+        <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-2">
+          <span className="h-[0.5px] flex-1" style={{ background: lineMuted }} aria-hidden />
+          <span className="text-[0.58rem] uppercase tracking-[0.28em] sm:text-[0.65rem] sm:tracking-[0.34em]">
+            {dayShort}
+          </span>
+          <span className="h-[0.5px] w-5 sm:w-7" style={{ background: lineMuted }} aria-hidden />
         </div>
 
-        <span
-          className={`${cinzel.className} text-[clamp(0.85rem,3.2vw,1.15rem)] font-semibold uppercase tracking-[0.32em] sm:tracking-[0.38em]`}
-          style={goldGradientText}
-        >
-          {year}
-        </span>
+        <div className="relative flex shrink-0 items-center justify-center px-2 sm:px-3">
+          <span
+            className="pointer-events-none absolute inset-0 -z-10 m-auto h-[3.25rem] w-[3.25rem] rounded-full bg-white/20 blur-xl sm:h-[4.5rem] sm:w-[4.5rem] md:h-[5rem] md:w-[5rem]"
+            aria-hidden
+          />
+          <span className="relative text-[clamp(2.75rem,14vw,4.25rem)] font-bold leading-none tracking-wider sm:text-[4rem] md:text-[4.75rem]">
+            {dayNumber}
+          </span>
+        </div>
+
+        <div className="flex flex-1 items-center gap-1.5 sm:gap-2">
+          <span className="h-[0.5px] w-5 sm:w-7" style={{ background: lineMuted }} aria-hidden />
+          <span className="text-[0.58rem] uppercase tracking-[0.22em] sm:text-[0.65rem] sm:tracking-[0.28em]">
+            {timeStr}
+          </span>
+          <span className="h-[0.5px] flex-1" style={{ background: lineMuted }} aria-hidden />
+        </div>
       </div>
+
+      <span className="text-[0.62rem] uppercase tracking-[0.38em] sm:text-[0.68rem] sm:tracking-[0.44em]">
+        {year}
+      </span>
+
+      {venueUpper ? (
+        <>
+          <p
+            className={`${cinzel.className} mt-4 max-w-[17rem] text-[0.56rem] font-semibold uppercase leading-relaxed tracking-[0.16em] sm:mt-5 sm:max-w-xs sm:text-[0.6rem] sm:tracking-[0.2em] md:max-w-sm`}
+            style={{
+              color: TEXT_WHITE,
+              textShadow: "0 1px 8px rgba(0, 0, 0, 0.45)",
+            }}
+          >
+            {venueUpper}
+          </p>
+          <VenueDivider />
+        </>
+      ) : null}
     </div>
   )
 }
 
 function ProposalRoleTitle({ roleSingular }: { roleSingular: string }) {
   return (
-    <div className="mx-auto w-full max-w-xl space-y-3 text-center sm:space-y-4">
-      {/* <p
-        className={`${cinzel.className} ${sectionType.label} font-semibold uppercase tracking-[0.16em] sm:tracking-[0.2em] md:tracking-[0.24em]`}
+    <div className="mx-auto w-full max-w-xl space-y-2 text-center sm:space-y-2.5 sm:text-left">
+      <p
+        className={`${cinzel.className} ${sectionType.label} font-semibold uppercase tracking-[0.14em] sm:tracking-[0.18em] md:tracking-[0.22em]`}
         style={{ color: palette.label }}
       >
-        Will You Stand With Us As Our
-      </p> */}
-
-      {/* <div className="flex items-center justify-center gap-3">
-       <InlineDivider compact />
-        <span
-          className={`${aboveTheBeyond.className} shrink-0 text-[clamp(1rem,3vw,1.35rem)] leading-none`}
-          style={{ color: palette.accent }}
-          aria-hidden
-        >
-          &
-        </span>
-        <InlineDivider compact /> 
-      </div> */}
-
+        Will you be my
+      </p>
       <h2
         className={`${theSeasons.className} capitalize leading-[0.94] tracking-[0.06em] sm:tracking-[0.1em] [overflow-wrap:anywhere]`}
         style={{
-          fontSize: "clamp(2rem, 8.5vw, 3.75rem)",
-          ...goldGradientText,
+          fontSize: "clamp(1.85rem, 7.5vw, 3.25rem)",
+          ...cardHeadingText,
         }}
       >
         {roleSingular}?
@@ -498,6 +510,8 @@ function ProposalIntroSection() {
   const { month, day: dateNum, year } = parsedDate
   const venue =
     siteConfig.wedding.venue ?? siteConfig.ceremony.location ?? defaultSiteConfig.ceremony.location
+  const timeStr = ceremonyTime.split(",")[0]?.trim() ?? ceremonyTime
+  const venueUpper = venue.trim().toUpperCase()
 
   return (
     <div
@@ -539,16 +553,10 @@ function ProposalIntroSection() {
         month={month}
         dayShort={ceremonyDayShort}
         dayNumber={dateNum}
-        time={ceremonyTime}
+        timeStr={timeStr}
         year={year}
+        venueUpper={venueUpper}
       />
-
-      <p
-        className={`${cinzel.className} text-[0.58rem] font-medium uppercase leading-relaxed tracking-[0.18em] sm:text-[0.65rem] sm:tracking-[0.22em]`}
-        style={{ color: INK }}
-      >
-        {venue}
-      </p>
 
       <div className="pt-1 sm:pt-2">
         <OrnamentalDivider compact />
@@ -624,13 +632,13 @@ function ProposalAskSection({
                 </p>
               </div>
 
-              <div className="relative h-[9.5rem] w-[5.75rem] shrink-0 sm:h-64 sm:w-40 md:h-72 md:w-48">
+              <div className="relative h-[10.5rem] w-[6.75rem] shrink-0 sm:h-[17rem] sm:w-[10.5rem] md:h-[19rem] md:w-72">
                 <Image
-                  src="/image/couple-image.png"
+                  src="/location/couple.png"
                   alt=""
                   fill
-                  className="object-contain object-bottom drop-shadow-[0_16px_32px_rgba(42,37,32,0.18)]"
-                  sizes="(max-width: 640px) 92px, 192px"
+                  className="object-contain object-bottom drop-shadow-[0_16px_32px_rgba(5,35,18,0.22)]"
+                  sizes="(max-width: 640px) 108px, 288px"
                   priority
                 />
               </div>
@@ -676,6 +684,137 @@ function ProposalAskSection({
   )
 }
 
+function ProposalDeclineModal({
+  open,
+  roleTitle,
+  roleSingular,
+  submitting,
+  error,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean
+  roleTitle: string
+  roleSingular: string
+  submitting: boolean
+  error: string
+  onClose: () => void
+  onConfirm: () => void
+}) {
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && !submitting) onClose()
+      }}
+    >
+      <DialogContent
+        showCloseButton={!submitting}
+        className={`${cinzel.className} max-w-[min(100%-1.5rem,22rem)] gap-0 overflow-hidden rounded-xl border-0 p-0 shadow-2xl sm:max-w-md sm:rounded-2xl [&_[data-slot=dialog-close]]:top-3.5 [&_[data-slot=dialog-close]]:right-3.5 [&_[data-slot=dialog-close]]:text-white/80 [&_[data-slot=dialog-close]]:opacity-90 hover:[&_[data-slot=dialog-close]]:text-white`}
+        style={cardStyle}
+      >
+        <DialogTitle className="sr-only">Confirm declining the wedding party invitation</DialogTitle>
+        <DialogDescription className="sr-only">
+          Choose whether to go back to the invitation or send a polite decline for the {roleTitle}{" "}
+          role.
+        </DialogDescription>
+
+        <div className="relative px-5 py-7 text-center sm:px-8 sm:py-9">
+          <div
+            className="mx-auto mb-5 flex h-11 w-11 items-center justify-center rounded-full sm:mb-6 sm:h-12 sm:w-12"
+            style={{
+              border: `1px solid ${dividerFadeLight}`,
+              background: GLASS_ON_TEXTURE,
+            }}
+            aria-hidden
+          >
+            <Heart className="h-5 w-5" style={{ color: CHAMPAGNE }} />
+          </div>
+
+          <div className="mb-3 sm:mb-4">
+            <LayeredProposalTitle
+              main="Before you go"
+              script="may we ask once more"
+              titleSize="clamp(1.35rem, 5.5vw, 1.85rem)"
+              scriptSize="clamp(1.55rem, 6vw, 2.1rem)"
+              scriptOverlap="-0.42em"
+            />
+          </div>
+
+          <p
+            className={`${cinzel.className} ${sectionType.label} mx-auto mb-4 max-w-xs font-semibold uppercase tracking-[0.14em] sm:mb-5 sm:tracking-[0.18em]`}
+            style={{ color: palette.label }}
+          >
+            About the role we offered you
+          </p>
+
+          <div
+            className="mx-auto mb-5 max-w-sm rounded-lg border px-4 py-3 sm:mb-6"
+            style={{
+              background: GLASS_ON_TEXTURE,
+              borderColor: dividerFadeLight,
+            }}
+          >
+            <p
+              className={`${theSeasons.className} text-[clamp(1rem,4vw,1.2rem)] capitalize leading-snug tracking-[0.08em]`}
+              style={{ color: TEXT_WHITE }}
+            >
+              {roleSingular}
+            </p>
+            <p
+              className={`${cinzel.className} mt-1.5 text-[0.58rem] font-medium uppercase tracking-[0.16em] sm:text-[0.62rem] sm:tracking-[0.2em]`}
+              style={{ color: palette.bodySoft }}
+            >
+              {roleTitle}
+            </p>
+          </div>
+
+          <p
+            className={`${playfair.className} mx-auto mb-5 max-w-sm italic ${sectionType.textSnug} sm:mb-6`}
+            style={{ color: palette.body }}
+          >
+            We completely understand if you need to say no. If you send a decline, we will receive
+            it gently — and you can still celebrate with us as a cherished guest when the day
+            arrives.
+          </p>
+
+          <OrnamentalDivider compact />
+
+          {error ? (
+            <p
+              className={`${cinzel.className} mt-4 text-[0.65rem] font-medium uppercase tracking-[0.12em] text-rose-300 sm:text-xs`}
+              role="alert"
+            >
+              {error}
+            </p>
+          ) : null}
+
+          <div className="mt-6 flex flex-col gap-2.5 sm:mt-7 sm:flex-col-reverse sm:gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={submitting}
+              className={`${primaryBtnClass} w-full`}
+              style={primaryBtnStyle}
+            >
+              I&apos;d like to reconsider
+            </button>
+            <button
+              type="button"
+              onClick={onConfirm}
+              disabled={submitting}
+              className={`${secondaryBtnClass} w-full`}
+              style={declineConfirmBtnStyle}
+            >
+              {submitting ? "Sending…" : "Send polite decline"}
+            </button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 type ProposalFlowState =
   | "question"
   | "yes_details"
@@ -692,6 +831,7 @@ export function ProposalPage({ role }: ProposalPageProps) {
   const [preferredName, setPreferredName] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [validationError, setValidationError] = useState("")
+  const [declineError, setDeclineError] = useState("")
   const [responses, setResponses] = useState<ProposalResponse[]>([])
   const [showInvitation, setShowInvitation] = useState(false)
   const [loadingOverlayVisible, setLoadingOverlayVisible] = useState(true)
@@ -776,29 +916,39 @@ export function ProposalPage({ role }: ProposalPageProps) {
   }
 
   const handleNoSubmit = async () => {
+    setDeclineError("")
     setSubmitting(true)
     try {
       await submitResponse("Declined", "Declined Entourage Offer")
       setFlowState("no_submitted")
     } catch (err) {
       console.error("Failed to submit decline:", err)
+      setDeclineError("We couldn't send your response. Please try again.")
     } finally {
       setSubmitting(false)
     }
   }
 
+  const closeDeclineModal = useCallback(() => {
+    if (submitting) return
+    setDeclineError("")
+    setFlowState("question")
+  }, [submitting])
+
   const roleSingular = getRoleSingular(role.title)
 
   return (
     <div
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} ${playfair.className} relative min-h-screen select-none px-3 py-10 text-[#3d3228] sm:px-6 sm:py-16 md:py-20 ${pageScrollLocked ? "overflow-hidden" : "overflow-x-hidden"}`}
-      style={{ background: "#780008" }}
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} ${playfair.className} relative min-h-screen select-none px-3 py-10 sm:px-6 sm:py-16 md:py-20 ${pageScrollLocked ? "overflow-hidden" : "overflow-x-hidden"}`}
+      style={{ background: SILK_FALLBACK }}
     >
-      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
-        <Suspense fallback={<div className="h-full w-full bg-[#780008]" />}>
-          <Silk speed={8} scale={0.9} color="#780008" noiseIntensity={0} rotation={0.3} />
-        </Suspense>
-      </div>
+      {enableDecor && (
+        <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
+          <Suspense fallback={<div className="h-full w-full" style={{ background: SILK_FALLBACK }} />}>
+            <Silk speed={8} scale={0.9} color={SILK_FALLBACK} noiseIntensity={0} rotation={0.3} />
+          </Suspense>
+        </div>
+      )}
 
       {loadingOverlayVisible && (
         <LoadingScreen
@@ -842,13 +992,19 @@ export function ProposalPage({ role }: ProposalPageProps) {
         style={{ color: palette.body }}
       >
         <AnimatePresence mode="wait">
-          {flowState === "question" && (
+          {(flowState === "question" || flowState === "no_clicked") && (
             <motion.div
               key="question-box"
               initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={{
+                opacity: flowState === "no_clicked" ? 0.42 : 1,
+                scale: flowState === "no_clicked" ? 0.985 : 1,
+                filter: flowState === "no_clicked" ? "blur(2px)" : "blur(0px)",
+              }}
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: flowState === "no_clicked" ? 0.35 : 0.6, ease: "easeOut" }}
+              className={flowState === "no_clicked" ? "pointer-events-none" : undefined}
+              aria-hidden={flowState === "no_clicked"}
             >
               <ProposalCard>
               <div className="relative z-10 w-full space-y-6 pt-2 sm:space-y-9 sm:pt-3">
@@ -860,8 +1016,8 @@ export function ProposalPage({ role }: ProposalPageProps) {
                   <figure
                     className="rounded-md border px-4 py-3.5 sm:rounded-lg sm:px-5 sm:py-4"
                     style={{
-                      background: INNER_SURFACE,
-                      borderColor: BORDER_SOFT,
+                      background: GLASS_ON_TEXTURE,
+                      borderColor: dividerFadeLight,
                     }}
                   >
                     <blockquote>
@@ -924,12 +1080,12 @@ export function ProposalPage({ role }: ProposalPageProps) {
               <ProposalCard>
               <div className="relative z-10 w-full space-y-4 py-1 sm:space-y-6 sm:py-3">
                 <ProposalFlowHeader
-                  icon={<Check className="h-6 w-6" style={{ color: INK }} />}
+                  icon={<Check className="h-6 w-6" style={{ color: IVORY }} />}
                   iconClassName=""
                   iconStyle={{
-                    border: `1px solid ${GOLD_BORDER}`,
-                    background: "linear-gradient(180deg, #fff8dc 0%, #d4af37 100%)",
-                    color: INK,
+                    border: `1px solid ${BORDER_MOTIF}`,
+                    background: primaryBtnStyle.background,
+                    color: IVORY,
                   }}
                   main="We are Honored"
                   script="you said yes"
@@ -944,7 +1100,7 @@ export function ProposalPage({ role }: ProposalPageProps) {
 
                 <p
                   className={`${playfair.className} italic mx-auto mb-1 max-w-md text-center ${sectionType.textSnug}`}
-                  style={{ color: INK }}
+                  style={{ color: palette.body }}
                 >
                   Please enter the exact name you would like displayed on our wedding invitation
                   and guest lists:
@@ -960,7 +1116,7 @@ export function ProposalPage({ role }: ProposalPageProps) {
                     placeholder="e.g. Aunt Maria Clara / Mr. James Bond"
                     value={preferredName}
                     onChange={(e) => setPreferredName(e.target.value)}
-                    className={`${playfair.className} italic w-full rounded-xl px-4 py-2.5 text-xs text-[#3d3228] placeholder:text-[#3d3228]/45 transition-all focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 sm:py-3 sm:text-sm`}
+                    className={`${playfair.className} italic w-full rounded-xl px-4 py-2.5 text-xs placeholder:opacity-45 transition-all focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,#531314_25%,transparent)] sm:py-3 sm:text-sm`}
                     style={{
                       color: INK,
                       backgroundColor: INNER_SURFACE,
@@ -1018,7 +1174,7 @@ export function ProposalPage({ role }: ProposalPageProps) {
                     color: CHAMPAGNE,
                     border: `1px solid ${BORDER_SOFT}`,
                     backgroundColor: INNER_SURFACE,
-                    boxShadow: "0 8px 24px color-mix(in srgb, #d4af37 28%, transparent)",
+                    boxShadow: "0 8px 24px color-mix(in srgb, #531314 22%, transparent)",
                   }}
                   main="It's Official"
                   script="thank you"
@@ -1071,60 +1227,6 @@ export function ProposalPage({ role }: ProposalPageProps) {
             </motion.div>
           )}
 
-          {flowState === "no_clicked" && (
-            <motion.div
-              key="no-confirm"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-            >
-              <ProposalCard>
-              <div className="relative z-10 space-y-4">
-                <ProposalFlowHeader
-                  icon={<X className="h-6 w-6" style={{ color: CHAMPAGNE }} />}
-                  iconClassName=""
-                  iconStyle={{
-                    border: `1px solid ${BORDER_SOFT}`,
-                    backgroundColor: INNER_SURFACE,
-                    color: CHAMPAGNE,
-                  }}
-                  main="Thank You"
-                  script="for responding"
-                />
-
-                <ProposalFlowSubheader>We understand and appreciate your honesty</ProposalFlowSubheader>
-
-                <ProposalFlowBody className="mb-8 max-w-lg text-center sm:mb-10">
-                  While we&apos;re saddened that you won&apos;t be able to join us in this role, we
-                  truly appreciate your support and well wishes as we begin this new chapter
-                  together.
-                </ProposalFlowBody>
-
-                <div className="flex items-center justify-center pt-4">
-                  <DividerLine className="w-full max-w-md" />
-                </div>
-                <div className="mx-auto flex max-w-xs flex-col gap-3 sm:max-w-md sm:flex-row">
-                  <button
-                    onClick={handleNoSubmit}
-                    disabled={submitting}
-                    className={`${cinzel.className} flex-1 cursor-pointer rounded-full border px-8 py-4 text-[11px] font-semibold tracking-[0.18em] uppercase shadow-md transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50`}
-                    style={primaryBtnStyle}
-                  >
-                    {submitting ? "Sending..." : "Send Response"}
-                  </button>
-                  <button
-                    onClick={() => setFlowState("question")}
-                    className={secondaryBtnClass}
-                    style={secondaryBtnStyle}
-                  >
-                    Go Back
-                  </button>
-                </div>
-              </div>
-              </ProposalCard>
-            </motion.div>
-          )}
-
           {flowState === "no_submitted" && (
             <motion.div
               key="no-submitted-box"
@@ -1134,22 +1236,24 @@ export function ProposalPage({ role }: ProposalPageProps) {
               <ProposalCard>
               <div className="relative z-10 space-y-4">
                 <ProposalFlowHeader
-                  icon={<Heart className="h-6 w-6" style={{ color: CHAMPAGNE }} />}
+                  animated
+                  icon={<Heart className="h-7 w-7" style={{ color: CHAMPAGNE }} />}
                   iconStyle={{
                     color: CHAMPAGNE,
-                    border: `1px solid ${BORDER_SOFT}`,
-                    backgroundColor: INNER_SURFACE,
+                    border: `1px solid ${dividerFadeLight}`,
+                    background: GLASS_ON_TEXTURE,
+                    boxShadow: "0 8px 24px color-mix(in srgb, #000 28%, transparent)",
                   }}
-                  main="Response Sent"
-                  script="successfully"
+                  main="Thank You"
+                  script="for your honesty"
                 />
 
-                <ProposalFlowSubheader>Your message has reached us</ProposalFlowSubheader>
+                <ProposalFlowSubheader>We received your response with gratitude</ProposalFlowSubheader>
 
                 <ProposalFlowBody className="mb-6 max-w-md text-center sm:mb-8">
-                  We have received your response. Your love, support, and well wishes mean the
-                  world to us regardless. We look forward to celebrating other special milestones
-                  with you in the future.
+                  Though we hoped you could stand with us as our {roleSingular.toLowerCase()}, we
+                  hold no disappointment — only appreciation. Your friendship means the world to
+                  us, and we still hope to see you on our wedding day.
                 </ProposalFlowBody>
 
                 <div className="flex items-center justify-center pb-2 sm:pb-3">
@@ -1158,8 +1262,8 @@ export function ProposalPage({ role }: ProposalPageProps) {
 
                 <Link
                   href="/"
-                  className={`${secondaryBtnClass} mx-auto inline-block w-full max-w-sm`}
-                  style={secondaryBtnStyle}
+                  className={`${primaryBtnClass} mx-auto inline-block w-full max-w-sm text-center`}
+                  style={primaryBtnStyle}
                 >
                   Return to Wedding Page
                 </Link>
@@ -1168,6 +1272,16 @@ export function ProposalPage({ role }: ProposalPageProps) {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <ProposalDeclineModal
+          open={flowState === "no_clicked"}
+          roleTitle={role.title}
+          roleSingular={roleSingular}
+          submitting={submitting}
+          error={declineError}
+          onClose={closeDeclineModal}
+          onConfirm={handleNoSubmit}
+        />
       </motion.div>
     </div>
   )

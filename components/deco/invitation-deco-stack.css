@@ -1,0 +1,267 @@
+.invitation-deco-bg {
+  position: absolute;
+  inset: 0;
+  background-color: #0a1410;
+  background-image: url(/deco/background.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.invitation-deco-corner {
+  pointer-events: none;
+  position: absolute;
+  z-index: 20;
+  height: auto;
+  width: min(46vw, 11.5rem);
+  object-fit: contain;
+}
+
+.invitation-deco-corner--tl {
+  left: 0;
+  top: 0;
+  object-position: left top;
+}
+
+.invitation-deco-corner--br {
+  right: 0;
+  bottom: 0;
+  object-position: right bottom;
+}
+
+@media (min-width: 640px) {
+  .invitation-deco-corner {
+    width: min(40vw, 14rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .invitation-deco-corner {
+    width: min(32vw, 18rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .invitation-deco-corner {
+    width: min(28vw, 20rem);
+  }
+}
+
+.invitation-deco-main {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 0;
+  padding-top: clamp(2rem, 10.5vh, 4.75rem);
+  padding-bottom: clamp(0.5rem, 2vh, 1rem);
+}
+
+.invitation-deco-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: min(92vw, 26rem);
+  margin-inline: auto;
+}
+
+.invitation-deco-stack img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.invitation-deco-monogram {
+  width: min(26vw, 6.25rem);
+  margin-bottom: clamp(0.85rem, 2.8vh, 1.65rem);
+}
+
+.invitation-deco-save-the-date {
+  width: min(72vw, 17.25rem);
+  margin-bottom: clamp(0.65rem, 2.2vh, 1.15rem);
+}
+
+.invitation-deco-couple-wrap {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-top: clamp(0.85rem, 3.2vh, 1.75rem);
+  margin-bottom: clamp(1.85rem, 6.5vh, 3.5rem);
+}
+
+.invitation-deco-couple-name {
+  width: min(90vw, 24.5rem);
+  margin-inline: auto;
+  object-position: center center;
+}
+
+.invitation-deco-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.invitation-deco-date {
+  width: min(68vw, 16.75rem);
+  margin-top: 0;
+  margin-bottom: clamp(0.45rem, 1.5vh, 0.85rem);
+}
+
+.invitation-deco-location {
+  width: min(74vw, 18rem);
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .invitation-deco-main {
+    padding-top: clamp(1.75rem, 9.5vh, 3.5rem);
+  }
+
+  .invitation-deco-stack {
+    max-width: min(90vw, 23.5rem);
+  }
+
+  .invitation-deco-monogram {
+    width: min(24vw, 5.75rem);
+    margin-bottom: clamp(0.75rem, 2.5vh, 1.35rem);
+  }
+
+  .invitation-deco-save-the-date {
+    width: min(70vw, 16.5rem);
+    margin-bottom: clamp(0.55rem, 1.9vh, 0.95rem);
+  }
+
+  .invitation-deco-couple-wrap {
+    margin-top: clamp(1rem, 3.8vh, 2rem);
+    margin-bottom: clamp(2rem, 7vh, 3.75rem);
+  }
+
+  .invitation-deco-couple-name {
+    width: min(88vw, 22.5rem);
+  }
+
+  .invitation-deco-date {
+    width: min(66vw, 15.75rem);
+    margin-bottom: clamp(0.4rem, 1.35vh, 0.75rem);
+  }
+
+  .invitation-deco-location {
+    width: min(72vw, 16.75rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .invitation-deco-main {
+    justify-content: center;
+    padding-top: clamp(1.5rem, 6vh, 3rem);
+    padding-bottom: clamp(1rem, 3vh, 2rem);
+  }
+
+  .invitation-deco-stack {
+    max-width: min(36rem, 58vw);
+  }
+
+  .invitation-deco-monogram {
+    width: min(18vw, 7.75rem);
+    margin-bottom: clamp(1rem, 3.2vh, 2rem);
+  }
+
+  .invitation-deco-save-the-date {
+    width: min(42vw, 22rem);
+    margin-bottom: clamp(0.75rem, 2.4vh, 1.25rem);
+  }
+
+  .invitation-deco-couple-name {
+    width: min(52vw, 32rem);
+  }
+
+  .invitation-deco-couple-wrap {
+    margin-top: clamp(1rem, 3.5vh, 2rem);
+    margin-bottom: clamp(2.35rem, 7.5vh, 4.5rem);
+  }
+
+  .invitation-deco-date {
+    width: min(38vw, 24rem);
+    margin-bottom: clamp(0.55rem, 1.8vh, 1rem);
+  }
+
+  .invitation-deco-location {
+    width: min(40vw, 25rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .invitation-deco-stack {
+    max-width: min(40rem, 52vw);
+  }
+
+  .invitation-deco-monogram {
+    width: min(14vw, 8.5rem);
+  }
+
+  .invitation-deco-save-the-date {
+    width: min(36vw, 24rem);
+  }
+
+  .invitation-deco-couple-name {
+    width: min(46vw, 34rem);
+  }
+
+  .invitation-deco-date {
+    width: min(34vw, 26rem);
+  }
+
+  .invitation-deco-location {
+    width: min(36vw, 27rem);
+  }
+}
+
+@media (max-height: 680px) {
+  .invitation-deco-main {
+    padding-top: clamp(1rem, 5vh, 1.75rem);
+  }
+
+  .invitation-deco-monogram {
+    width: min(22vw, 5rem);
+    margin-bottom: clamp(0.45rem, 1.6vh, 0.75rem);
+  }
+
+  .invitation-deco-save-the-date {
+    width: min(64vw, 14.5rem);
+    margin-bottom: clamp(0.35rem, 1.1vh, 0.55rem);
+  }
+
+  .invitation-deco-couple-name {
+    width: min(84vw, 19.5rem);
+  }
+
+  .invitation-deco-couple-wrap {
+    margin-top: clamp(0.55rem, 2.2vh, 1rem);
+    margin-bottom: clamp(1.15rem, 4.5vh, 2.1rem);
+  }
+
+  .invitation-deco-date {
+    width: min(62vw, 14rem);
+    margin-bottom: clamp(0.3rem, 1vh, 0.55rem);
+  }
+
+  .invitation-deco-location {
+    width: min(66vw, 14.75rem);
+  }
+}
+
+.invitation-deco-main--with-nav {
+  padding-top: clamp(0.75rem, 4vh, 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .invitation-deco-main--with-nav {
+    padding-top: clamp(1rem, 3vh, 2rem);
+  }
+}

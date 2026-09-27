@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react"
 import localFont from "next/font/local"
 import { Cinzel } from "next/font/google"
 import { useSiteConfig } from "@/hooks/use-site-config"
+import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { layeredSectionTitleSize, sectionType } from "@/lib/section-typography"
 import { fetchInvitationList } from "@/lib/invitation-data"
 
@@ -25,76 +26,65 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
-const C = {
-  forest: "#5d6f47",
-  sage: "#949981",
-  mustard: "#eec853",
-  butter: "#f4dd97",
-  cream: "#f7f3e9",
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_FOREST = "#052312"
+const IVORY = "#fffaf4"
+const MOTIF_CREAM = "#f4f0e8"
+const TEXT_ON_BURGUNDY = IVORY
+
+const borderMuted = `color-mix(in srgb, ${MOTIF_BURGUNDY} 22%, transparent)`
+const borderSoft = `color-mix(in srgb, ${MOTIF_BURGUNDY} 14%, transparent)`
+
+const TEXT_WHITE = "#ffffff"
+
+const scriptGlowOnDark = {
+  textShadow: "0 1px 12px rgba(0, 0, 0, 0.55)",
 } as const
 
-const creamWash = `
-  radial-gradient(920px 520px at 50% 8%, color-mix(in srgb, ${C.butter} 35%, transparent) 0%, transparent 55%),
-  radial-gradient(640px 420px at 12% 88%, color-mix(in srgb, ${C.sage} 16%, transparent) 0%, transparent 58%),
-  radial-gradient(560px 380px at 92% 78%, color-mix(in srgb, ${C.mustard} 14%, transparent) 0%, transparent 55%),
-  linear-gradient(180deg, ${C.cream} 0%, #faf7ef 48%, ${C.cream} 100%)
-`
-
-const IVORY = "#fffaf4"
-const GOLD = "var(--color-welcome-gold)"
-const NAVY = "var(--color-welcome-navy)"
-const BODY = "var(--color-welcome-text)"
-const NAV_GOLD =
-  "linear-gradient(180deg, #E8D5A3 0%, #CDB072 52%, #C4A265 100%)"
-const GOLD_BORDER = "color-mix(in srgb, var(--color-welcome-gold) 38%, transparent)"
-const GOLD_BORDER_SOFT = "color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)"
+const scriptGlow = {
+  textShadow:
+    "0 1px 0 color-mix(in srgb, #fffaf4 95%, white), 0 0 10px color-mix(in srgb, #531314 18%, transparent)",
+} as const
 
 const palette = {
-  body: BODY,
-  heading: NAVY,
-  label: GOLD,
-  accent: GOLD,
+  body: `color-mix(in srgb, ${MOTIF_FOREST} 78%, #4a5c4e)`,
+  heading: MOTIF_FOREST,
+  label: MOTIF_BURGUNDY,
+  accent: MOTIF_BURGUNDY,
 } as const
 
 const cardStyle = {
-  background: "var(--color-welcome-bg)",
-  borderColor: "color-mix(in srgb, var(--color-motif-deep) 14%, transparent)",
+  background: IVORY,
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`,
   borderWidth: "1px",
   borderStyle: "solid",
-  boxShadow:
-    "0 8px 28px color-mix(in srgb, var(--color-motif-deep) 7%, transparent), inset 0 1px 0 color-mix(in srgb, white 70%, transparent)",
+  boxShadow: "0 10px 28px color-mix(in srgb, #052312 10%, transparent)",
 } as const
 
 const ambientGlowStyle = {
-  background:
-    "linear-gradient(135deg, color-mix(in srgb, var(--color-motif-deep) 18%, transparent) 0%, color-mix(in srgb, var(--color-welcome-green) 12%, transparent) 48%, color-mix(in srgb, var(--color-motif-deep) 10%, transparent) 100%)",
+  background: `linear-gradient(135deg, color-mix(in srgb, ${MOTIF_BURGUNDY} 14%, transparent) 0%, color-mix(in srgb, ${MOTIF_FOREST} 10%, transparent) 100%)`,
 } as const
 
 const dividerLineStyle = {
-  background:
-    "linear-gradient(to right, transparent, color-mix(in srgb, var(--color-motif-deep) 38%, transparent), transparent)",
+  background: `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
 } as const
 
-const CORNER_DECO_CLASS =
-  "block h-auto w-auto max-w-[120px] sm:max-w-[180px] md:max-w-[260px] lg:max-w-[320px] xl:max-w-[380px] select-none"
-
 const refreshButtonStyle = {
-  borderColor: "color-mix(in srgb, var(--color-motif-deep) 14%, transparent)",
-  backgroundColor: "var(--color-welcome-bg-soft)",
-  boxShadow:
-    "0 4px 14px color-mix(in srgb, var(--color-motif-deep) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 70%, transparent)",
+  borderColor: borderMuted,
+  backgroundColor: `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
+  boxShadow: "0 4px 14px color-mix(in srgb, #052312 8%, transparent)",
 } as const
 
 const chipPrimaryStyle = {
-  color: NAVY,
-  borderColor: GOLD_BORDER,
-  backgroundColor: "color-mix(in srgb, var(--color-welcome-gold) 12%, white)",
+  color: MOTIF_FOREST,
+  borderColor: borderMuted,
+  backgroundColor: `color-mix(in srgb, ${IVORY} 88%, ${MOTIF_CREAM})`,
 } as const
 
 const chipSecondaryStyle = {
-  color: NAVY,
-  borderColor: GOLD_BORDER_SOFT,
-  backgroundColor: "color-mix(in srgb, var(--color-welcome-gold) 8%, white)",
+  color: MOTIF_FOREST,
+  borderColor: borderSoft,
+  backgroundColor: `color-mix(in srgb, ${IVORY} 94%, ${MOTIF_CREAM})`,
 } as const
 
 const ct = {
@@ -106,7 +96,7 @@ const ct = {
   meta: sectionType.label,
 } as const
 
-function BookOfGuestsTitle() {
+function BookOfGuestsTitle({ onDark = false }: { onDark?: boolean }) {
   return (
     <h2
       className="welcome-title-lockup relative mx-auto w-full max-w-full text-center"
@@ -121,7 +111,8 @@ function BookOfGuestsTitle() {
         className={`${theSeasons.className} block uppercase leading-[0.78] tracking-[0.08em] min-[400px]:tracking-[0.11em] sm:tracking-[0.13em] md:tracking-[0.14em] pb-1 sm:pb-1.5`}
         style={{
           fontSize: "var(--title-size)",
-          color: "var(--color-welcome-navy)",
+          color: onDark ? TEXT_WHITE : palette.heading,
+          textShadow: onDark ? "0 1px 10px rgba(0, 0, 0, 0.45)" : undefined,
         }}
       >
         Book of Guests
@@ -131,7 +122,8 @@ function BookOfGuestsTitle() {
         className={`${aboveTheBeyond.className} mx-auto block w-fit max-w-full px-1 leading-[0.88] sm:leading-[0.9] mt-2 sm:mt-2.5 md:mt-3`}
         style={{
           fontSize: "var(--script-size)",
-          color: "var(--color-welcome-green)",
+          color: onDark ? IVORY : palette.accent,
+          ...(onDark ? scriptGlowOnDark : scriptGlow),
         }}
       >
         celebrating with us
@@ -295,55 +287,49 @@ export function BookOfGuests() {
   return (
     <div
       id="guests"
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative isolate z-10 overflow-hidden pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-12 md:pb-12 lg:pt-14 lg:pb-14`}
-      style={{ background: creamWash }}
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative isolate z-10 scroll-mt-16 overflow-hidden bg-[#0a1410] pb-16 pt-16 sm:scroll-mt-20 sm:pb-20 sm:pt-20 md:scroll-mt-24 md:pb-24 md:pt-24`}
     >
-      {/* Corner decorations */}
-      <div className="pointer-events-none absolute left-0 top-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/left-top-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute right-0 top-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/right-top-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute bottom-0 left-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/left-bottom-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute bottom-0 right-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/right-bottom-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={cornerTextureBackgroundStyle}
+        aria-hidden
+      />
+      <img
+        src="/corner/left-top-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-left-top sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
+      <img
+        src="/corner/right-top-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute right-0 top-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-right-top sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
+      <img
+        src="/corner/left-bottom-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-left-bottom sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
+      <img
+        src="/corner/right-bottom-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 right-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-right-bottom sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
 
       {/* Section Header */}
       <div className="relative z-20 mx-auto mb-6 max-w-5xl px-6 text-center @container/book-of-guests sm:mb-8 sm:px-10 md:mb-10 md:px-12">
         <div className="mt-8 mb-4 sm:mt-10 sm:mb-5 md:mt-12 md:mb-6">
-          <BookOfGuestsTitle />
+          <BookOfGuestsTitle onDark />
         </div>
         <p
           className={`font-goudy-italic mx-auto max-w-2xl px-2 ${sectionType.textRelaxed}`}
-          style={{ color: "var(--color-welcome-text)" }}
+          style={{
+            color: "color-mix(in srgb, #ffffff 90%, transparent)",
+            textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
+          }}
         >
           Meet the cherished souls joining us in celebration — your presence makes our day truly
           special.
@@ -364,15 +350,9 @@ export function BookOfGuests() {
               aria-hidden
             />
             <div
-              className="relative z-20 overflow-hidden rounded-xl border backdrop-blur-xl transition-all duration-300 sm:rounded-2xl sm:backdrop-blur-2xl"
+              className="relative z-20 overflow-hidden rounded-xl border transition-all duration-300 sm:rounded-2xl"
               style={cardStyle}
             >
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/40 via-white/10 to-transparent" aria-hidden />
-              <div
-                className="pointer-events-none absolute inset-0 rounded-xl sm:rounded-2xl ring-1 ring-inset ring-white/35"
-                aria-hidden
-              />
-
               {/* Refresh — corner icon, outside centered content flow */}
               <button
                 type="button"
@@ -385,7 +365,7 @@ export function BookOfGuests() {
               >
                 <RefreshCw
                   className={`h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-500 ${isRefreshing ? "animate-spin" : "group-hover:rotate-180"}`}
-                  style={{ color: GOLD }}
+                  style={{ color: MOTIF_BURGUNDY }}
                   aria-hidden
                 />
               </button>
@@ -472,7 +452,7 @@ export function BookOfGuests() {
                 {getVisibleGuests().map((guest, index) => (
                   <div
                     key={`${guest.id}-${currentIndex}-${index}`}
-                    className={`relative z-20 group rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-5 transition-all duration-300 border backdrop-blur-xl overflow-hidden hover:shadow-xl ${justEntered ? "animate-guest-roll-in" : ""}`}
+                    className={`relative z-20 group rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-5 transition-all duration-300 border overflow-hidden hover:shadow-[0_12px_32px_color-mix(in_srgb,#052312_12%,transparent)] ${justEntered ? "animate-guest-roll-in" : ""}`}
                     style={{
                       ...cardStyle,
                       ...(justEntered
@@ -483,24 +463,26 @@ export function BookOfGuests() {
                         : {}),
                     }}
                   >
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden />
                   <div
-                    className="pointer-events-none absolute inset-0 rounded-xl sm:rounded-2xl ring-1 ring-inset ring-white/20 group-hover:ring-white/40 transition-all duration-300"
+                    className="pointer-events-none absolute left-0 top-0 h-0.5 w-full origin-left scale-x-0 transform transition-transform duration-500 group-hover:scale-x-100"
+                    style={{
+                      background: `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
+                    }}
                     aria-hidden
                   />
                   <div className="relative z-[1] flex items-start gap-3 sm:gap-4">
                     <div className="relative flex-shrink-0">
                       <div
-                        className="flex h-11 w-11 items-center justify-center rounded-full ring-2 ring-white/80 sm:h-12 sm:w-12 md:h-14 md:w-14"
+                        className="flex h-11 w-11 items-center justify-center rounded-full sm:h-12 sm:w-12 md:h-14 md:w-14"
                         style={{
-                          background: NAV_GOLD,
-                          boxShadow:
-                            "0 6px 14px color-mix(in srgb, var(--color-welcome-gold) 28%, transparent)",
+                          backgroundColor: MOTIF_BURGUNDY,
+                          boxShadow: "0 6px 14px color-mix(in srgb, #531314 28%, transparent)",
+                          border: `1px solid color-mix(in srgb, ${MOTIF_FOREST} 22%, transparent)`,
                         }}
                       >
                         <span
                           className={`${cinzel.className} font-semibold ${sectionType.text}`}
-                          style={{ color: IVORY }}
+                          style={{ color: TEXT_ON_BURGUNDY }}
                         >
                           {getInitials(guest.name)}
                         </span>
@@ -530,9 +512,9 @@ export function BookOfGuests() {
                           <span
                             className={`${cinzel.className} shrink-0 ${ct.meta} px-2 py-0.5 rounded-full font-semibold uppercase tracking-[0.12em] border`}
                             style={{
-                              background: NAV_GOLD,
-                              color: IVORY,
-                              borderColor: GOLD_BORDER,
+                              backgroundColor: MOTIF_BURGUNDY,
+                              color: TEXT_ON_BURGUNDY,
+                              borderColor: `color-mix(in srgb, ${MOTIF_FOREST} 28%, transparent)`,
                             }}
                           >
                             VIP
@@ -563,7 +545,7 @@ export function BookOfGuests() {
                         <div
                           className="pt-2.5 sm:pt-3 border-t"
                           style={{
-                            borderColor: "color-mix(in srgb, var(--color-motif-deep) 14%, transparent)",
+                            borderColor: borderSoft,
                           }}
                         >
                           <span
@@ -578,8 +560,8 @@ export function BookOfGuests() {
                                 key={idx}
                                 className="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg border transition-colors"
                                 style={{
-                                  borderColor: "color-mix(in srgb, var(--color-motif-deep) 14%, transparent)",
-                                  backgroundColor: "var(--color-welcome-bg-soft)",
+                                  borderColor: borderSoft,
+                                  backgroundColor: `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
                                 }}
                               >
                                 <span className={`font-goudy-italic ${ct.meta} whitespace-nowrap font-medium`} style={{ color: palette.body }}>
@@ -602,7 +584,7 @@ export function BookOfGuests() {
                       <div
                         className="pt-2.5 sm:pt-3 mt-2.5 border-t flex items-center justify-between gap-2"
                         style={{
-                          borderColor: "color-mix(in srgb, var(--color-motif-deep) 12%, transparent)",
+                          borderColor: borderSoft,
                         }}
                       >
                         <span className={`font-goudy-italic ${ct.meta}`} style={{ color: palette.body, opacity: 0.85 }}>
@@ -658,7 +640,7 @@ export function BookOfGuests() {
 
         {confirmedGuests.length === 0 && !isRefreshing && (
           <div className="relative z-20 max-w-xl mx-auto text-center px-4">
-            <div className="rounded-xl border px-6 py-10 backdrop-blur-xl sm:rounded-2xl sm:py-12" style={cardStyle}>
+            <div className="rounded-xl border px-6 py-10 sm:rounded-2xl sm:py-12" style={cardStyle}>
               <p className={`${cinzel.className} ${ct.bodyLg} mb-2 font-semibold`} style={{ color: palette.heading }}>
                 Guest list updating
               </p>

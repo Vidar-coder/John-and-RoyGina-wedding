@@ -1,11 +1,10 @@
 "use client"
 
-import { Section } from "@/components/section"
 import { useState, useEffect, type ReactNode } from "react"
 import { QRCodeSVG } from "qrcode.react"
 import { useSiteConfig } from "@/hooks/use-site-config"
+import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { sectionType } from "@/lib/section-typography"
-import { sectionBackground } from "@/lib/section-background"
 import Image from "next/image"
 import localFont from "next/font/local"
 import { Cinzel } from "next/font/google"
@@ -39,58 +38,78 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
-const CORNER_DECO_CLASS =
-  "block h-auto w-auto max-w-[80px] sm:max-w-[120px] md:max-w-[170px] lg:max-w-[205px] xl:max-w-[245px] select-none"
-
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_FOREST = "#052312"
 const IVORY = "#fffaf4"
-const GOLD = "var(--color-welcome-gold)"
-const NAVY = "var(--color-welcome-navy)"
-const SCRIPT = "var(--color-welcome-green)"
-const BODY = "var(--color-welcome-text)"
-const NAV_GOLD =
-  "linear-gradient(180deg, #E8D5A3 0%, #CDB072 52%, #C4A265 100%)"
+const MOTIF_CREAM = "#f4f0e8"
+const TEXT_ON_BURGUNDY = IVORY
+
+const dividerFade = `color-mix(in srgb, ${MOTIF_BURGUNDY} 55%, transparent)`
+const QR_BG = IVORY
+const QR_FG = MOTIF_FOREST
+
+const TEXT_WHITE = "#ffffff"
+const dividerFadeLight = "color-mix(in srgb, #ffffff 42%, transparent)"
+
+const scriptGlowOnDark = {
+  textShadow: "0 1px 12px rgba(0, 0, 0, 0.55)",
+} as const
+
+const scriptGlow = {
+  textShadow:
+    "0 1px 0 color-mix(in srgb, #fffaf4 95%, white), 0 0 10px color-mix(in srgb, #531314 18%, transparent)",
+} as const
 
 const detailText = {
-  body: BODY,
-  heading: NAVY,
-  label: GOLD,
-  accent: GOLD,
+  body: `color-mix(in srgb, ${MOTIF_FOREST} 78%, #4a5c4e)`,
+  heading: MOTIF_FOREST,
+  label: MOTIF_BURGUNDY,
+  accent: MOTIF_BURGUNDY,
 } as const
 
-const GOLD_BORDER = "color-mix(in srgb, var(--color-welcome-gold) 38%, transparent)"
-const GOLD_BORDER_SOFT = "color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)"
-
-const goldDividerStyle = {
-  background: "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
+const dividerLineStyle = {
+  background: `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
 } as const
 
-const goldDividerStyleLeft = {
-  background: "linear-gradient(to left, transparent, var(--color-welcome-gold), transparent)",
+const dividerLineStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${MOTIF_BURGUNDY}, transparent)`,
 } as const
 
 const cardStyle = {
   background: IVORY,
-  borderColor: GOLD_BORDER,
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`,
   borderWidth: "1px",
   borderStyle: "solid",
-  boxShadow:
-    "0 10px 28px color-mix(in srgb, var(--color-welcome-gold) 12%, transparent), inset 0 1px 0 rgb(255 250 244 / 70%)",
+  boxShadow: "0 10px 28px color-mix(in srgb, #052312 10%, transparent)",
 } as const
 
 const softPanelStyle = {
-  borderColor: GOLD_BORDER_SOFT,
-  backgroundColor: `color-mix(in srgb, ${IVORY} 82%, #E8D5A3)`,
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 16%, transparent)`,
+  backgroundColor: `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
 } as const
 
-const QR_FG = "#5E5144"
-const QR_BG = IVORY
+const accentPanelStyle = {
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 28%, transparent)`,
+  backgroundColor: `color-mix(in srgb, ${IVORY} 94%, ${MOTIF_CREAM})`,
+} as const
 
-function SectionIconDivider({ icon }: { icon: React.ReactNode }) {
+function SectionIconDivider({
+  icon,
+  tone = "burgundy",
+}: {
+  icon: React.ReactNode
+  tone?: "burgundy" | "light"
+}) {
+  const line =
+    tone === "light" ? { background: dividerFadeLight } : dividerLineStyle
+  const lineLeft =
+    tone === "light" ? { background: dividerFadeLight } : dividerLineStyleLeft
+
   return (
     <div className="flex items-center justify-center gap-1.5 pt-1 sm:pt-2">
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyle} />
+      <span className="h-px w-6 sm:w-10" style={line} aria-hidden />
       {icon}
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={lineLeft} aria-hidden />
     </div>
   )
 }
@@ -117,12 +136,16 @@ function StyledAddress({ text }: { text: string }) {
   )
 }
 
-function OutsideDivider() {
+function OutsideDivider({ tone = "burgundy" }: { tone?: "burgundy" | "light" }) {
+  const line = tone === "light" ? dividerFadeLight : dividerLineStyle.background
+  const lineLeft = tone === "light" ? dividerFadeLight : dividerLineStyleLeft.background
+  const dot = tone === "light" ? dividerFadeLight : dividerFade
+
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyle} />
-      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: GOLD }} aria-hidden />
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={{ background: line }} aria-hidden />
+      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: dot }} aria-hidden />
+      <span className="h-px w-6 sm:w-10" style={{ background: lineLeft }} aria-hidden />
     </div>
   )
 }
@@ -132,7 +155,7 @@ const detailsTitleSize = {
   script: "clamp(0.95rem, 4.8vw, 2.7rem)",
 } as const
 
-function DetailsTitle() {
+function DetailsTitle({ onDark = false }: { onDark?: boolean }) {
   return (
     <h2
       className="welcome-title-lockup relative mx-auto w-full max-w-full text-center"
@@ -149,7 +172,8 @@ function DetailsTitle() {
         className={`${theSeasons.className} block uppercase leading-[0.9] tracking-[0.04em] min-[400px]:tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.14em]`}
         style={{
           fontSize: "var(--title-size)",
-          color: NAVY,
+          color: onDark ? TEXT_WHITE : detailText.heading,
+          textShadow: onDark ? "0 1px 10px rgba(0, 0, 0, 0.45)" : undefined,
         }}
       >
         Event Details
@@ -159,9 +183,8 @@ function DetailsTitle() {
         className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-1.5 block w-fit max-w-full px-1 leading-[0.88] sm:mt-2 sm:leading-[0.9]`}
         style={{
           fontSize: "var(--script-size)",
-          color: SCRIPT,
-          textShadow:
-            "0 1px 0 color-mix(in srgb, var(--color-welcome-bg) 95%, white), 0 0 10px color-mix(in srgb, var(--color-welcome-bg) 65%, white)",
+          color: onDark ? IVORY : detailText.accent,
+          ...(onDark ? scriptGlowOnDark : scriptGlow),
         }}
       >
         our special day
@@ -193,26 +216,12 @@ const ct = {
   reminderBody: "text-sm sm:text-base md:text-base lg:text-lg",
 } as const
 
-const LADIES_COLORS = [
-  "#6F7E6B",
-  "#7A8A75",
-  "#809078",
-  "#9AA48C",
-  "#A9B39B",
-  "#B4C0AA",
-  "#B3C9B4",
-  "#ADC9B2",
-  "#B0D4BA",
-] as const
-
-const GENTLEMEN_COLORS = [
-  "#232323",
-  "#636260",
-  "#7F7E7A",
-  "#CFBBA3",
-  "#CDBCAB",
-  "#B49B85",
-  "#7F5235",
+const GUEST_ATTIRE_PALETTE = [
+  "#325F4B",
+  "#444F25",
+  "#727C47",
+  "#651810",
+  "#664126",
 ] as const
 
 function ColorPalette({
@@ -242,50 +251,6 @@ function ColorPalette({
   )
 }
 
-function CoupleImagesCarousel({
-  coupleImages,
-  currentImageIndex,
-  rotationOffset,
-}: {
-  coupleImages: string[]
-  currentImageIndex: number
-  rotationOffset: number
-}) {
-  return (
-    <div className="mb-4 flex justify-center gap-2 sm:mb-5 sm:gap-2.5">
-      {coupleImages.map((image, index) => {
-        const isActive = index === currentImageIndex
-        const baseRotation = index === 0 ? -5 : index === 1 ? 5 : index === 2 ? -3 : 3
-        const currentRotation = isActive
-          ? baseRotation + Math.sin((rotationOffset * Math.PI) / 180) * 2
-          : baseRotation
-        const scale = isActive ? "scale(1.1)" : "scale(1)"
-        const itemClass = `relative h-14 w-14 overflow-hidden rounded-lg border-2 shadow-md transition-all duration-700 ease-in-out sm:h-16 sm:w-16 ${isActive ? "z-10 scale-110" : "scale-100 opacity-70"}`
-        const imgClass = `object-cover transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-70"}`
-
-        return (
-          <div
-            key={image}
-            className={itemClass}
-            style={{
-              transform: `rotate(${currentRotation}deg) ${scale}`,
-              borderColor: GOLD_BORDER,
-            }}
-          >
-            <Image
-              src={image}
-              alt={`Wedding couple ${index + 1}`}
-              fill
-              className={imgClass}
-              sizes="(max-width: 640px) 56px, 64px"
-            />
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 function ReminderCard({
   title,
   children,
@@ -295,13 +260,7 @@ function ReminderCard({
   children: ReactNode
   variant?: "soft" | "accent"
 }) {
-  const panelStyle =
-    variant === "accent"
-      ? {
-          borderColor: GOLD_BORDER,
-          backgroundColor: `color-mix(in srgb, ${IVORY} 88%, #E8D5A3)`,
-        }
-      : softPanelStyle
+  const panelStyle = variant === "accent" ? accentPanelStyle : softPanelStyle
 
   return (
     <div
@@ -324,113 +283,60 @@ function ReminderCard({
   )
 }
 
-function MotifLook({
-  label,
-  src,
-  alt,
-  colors,
-  children,
-}: {
-  label: string
-  src: string
-  alt: string
-  colors: readonly string[]
-  children?: ReactNode
-}) {
-  return (
-    <div className="space-y-3 text-center sm:space-y-3.5">
-      <p
-        className={`${cinzel.className} ${ct.labelSm} font-semibold uppercase tracking-[0.22em] sm:tracking-[0.28em]`}
-        style={{ color: detailText.label }}
-      >
-        {label}
-      </p>
-      <Image
-        src={src}
-        alt={alt}
-        width={1400}
-        height={800}
-        className="mx-auto h-auto w-full object-contain"
-        sizes="(max-width: 768px) 100vw, 768px"
-      />
-      <ColorPalette colors={colors} className="max-w-md sm:max-w-lg" />
-      {children ? <div className="mx-auto max-w-sm space-y-3 pt-1 sm:space-y-3.5">{children}</div> : null}
-    </div>
-  )
-}
-
 function DressCodePalette() {
+  const siteConfig = useSiteConfig()
+  const themeLabel =
+    siteConfig.dressCode?.theme?.trim() ||
+    siteConfig.wedding.theme?.trim() ||
+    "Formal celebration attire"
+
   return (
     <div
       className="relative mx-auto mb-8 max-w-3xl overflow-hidden rounded-2xl border shadow-sm sm:mb-10 md:rounded-3xl"
-      style={{
-        background: IVORY,
-        borderColor: GOLD_BORDER,
-        boxShadow:
-          "0 10px 28px color-mix(in srgb, var(--color-welcome-gold) 12%, transparent), inset 0 1px 0 rgb(255 250 244 / 70%)",
-      }}
+      style={cardStyle}
     >
       <div className="px-5 pb-4 pt-6 text-center sm:px-8 sm:pb-5 sm:pt-8">
         <p
           className={`${cinzel.className} text-[0.625rem] font-semibold uppercase tracking-[0.28em] sm:text-[0.6rem] sm:tracking-[0.36em]`}
-          style={{ color: GOLD }}
+          style={{ color: detailText.label }}
         >
           Guest Attire
         </p>
         <h3
           className={`${aboveTheBeyond.className} mt-1 block px-1 text-[1.5rem] leading-tight sm:text-[1.95rem]`}
-          style={{ color: SCRIPT }}
+          style={{ color: detailText.accent, ...scriptGlow }}
         >
-          Whimsical Spring Minimalist
+          {themeLabel}
         </h3>
 
         <div className="mt-3 flex items-center justify-center gap-2 sm:mt-4">
-          <span className="h-px flex-1" style={goldDividerStyle} />
+          <span className="h-px flex-1" style={dividerLineStyle} />
           <Heart
             className="h-2 w-2 sm:h-2.5 sm:w-2.5"
-            style={{ color: GOLD, fill: "currentColor" }}
+            style={{ color: MOTIF_BURGUNDY, fill: "currentColor" }}
             aria-hidden
           />
-          <span className="h-px flex-1" style={goldDividerStyleLeft} />
+          <span className="h-px flex-1" style={dividerLineStyleLeft} />
         </div>
       </div>
 
-      <div className="space-y-10 px-5 pb-8 sm:space-y-12 sm:px-8 sm:pb-10">
-        <MotifLook
-          label="Ladies"
-          src="/Details/guest-ladies.png"
-          alt="Ladies guest attire"
-          colors={LADIES_COLORS}
+      <div className="space-y-6 px-5 pb-8 sm:space-y-7 sm:px-8 sm:pb-10">
+        <Image
+          src="/image/guestAttire.png"
+          alt="Guest attire guide"
+          width={1536}
+          height={1024}
+          className="mx-auto h-auto w-full max-w-2xl object-contain"
+          sizes="(max-width: 768px) 100vw, 672px"
+        />
+        <ColorPalette colors={GUEST_ATTIRE_PALETTE} className="max-w-sm sm:max-w-md" />
+        <p
+          className={`font-goudy-italic ${ct.body} mx-auto max-w-lg leading-relaxed`}
+          style={{ color: detailText.body }}
         >
-          <ul
-            className={`font-goudy-italic ${ct.body} mx-auto list-none space-y-1 p-0 text-center leading-snug`}
-            style={{ color: detailText.body }}
-          >
-            <li>Floor length dress in shades of pastel green</li>
-          </ul>
-        </MotifLook>
-        <MotifLook
-          label="Gentlemen"
-          src="/Details/guest-gentlemen.png"
-          alt="Gentlemen guest attire"
-          colors={GENTLEMEN_COLORS}
-        >
-          <ul
-            className={`font-goudy-italic ${ct.body} mx-auto w-fit list-disc space-y-1.5 pl-5 text-left leading-snug marker:text-[color:var(--color-welcome-gold)]`}
-            style={{ color: detailText.body }}
-          >
-            <li>Black and white suit</li>
-            <li>White and gray suit</li>
-            <li>Sage green long sleeves with neutral-colored pants</li>
-            <li>White long sleeves with neutral-colored pants</li>
-          </ul>
-          <p
-            className={`font-goudy-italic ${ct.body} mx-auto max-w-sm pt-1 leading-snug`}
-            style={{ color: detailText.body }}
-          >
-            Strictly no rubber shoes
-          </p>
-        </MotifLook>
+          Please dress in the suggested colors above so we can celebrate together in harmony with our
+          wedding palette.
+        </p>
       </div>
     </div>
   )
@@ -482,13 +388,12 @@ function EventVenueCard({
       <div
         className="absolute -inset-1 rounded-2xl opacity-0 blur-lg transition-opacity duration-500 group-hover:opacity-100"
         style={{
-          background:
-            "linear-gradient(to bottom right, color-mix(in srgb, var(--color-welcome-gold) 22%, transparent), transparent)",
+          background: `linear-gradient(to bottom right, ${dividerFade}, transparent)`,
         }}
       />
 
       <div
-        className="relative rounded-xl sm:rounded-2xl overflow-hidden border transition-all duration-300"
+        className="relative overflow-hidden rounded-xl border transition-all duration-300 sm:rounded-2xl"
         style={cardStyle}
       >
         <div className="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 xl:h-[30rem] overflow-hidden">
@@ -567,7 +472,7 @@ function EventVenueCard({
                   </p>
                   <div
                     className="h-10 sm:h-12 md:h-14 w-[2px] rounded-full"
-                    style={{ backgroundColor: GOLD }}
+                    style={{ backgroundColor: dividerFade }}
                   />
                   <p
                     className={`${cinzel.className} ${ct.year} font-semibold leading-none`}
@@ -610,8 +515,8 @@ function EventVenueCard({
                 <div
                   className="p-1.5 sm:p-2 md:p-2.5 rounded-lg border shadow-sm"
                   style={{
-                    backgroundColor: IVORY,
-                    borderColor: GOLD_BORDER_SOFT,
+                    backgroundColor: QR_BG,
+                    borderColor: dividerFade,
                   }}
                 >
                   <QRCodeSVG
@@ -636,11 +541,10 @@ function EventVenueCard({
               onClick={() => onOpenMaps(mapsLink)}
               className={`${cinzel.className} flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2.5 sm:py-3 md:py-3.5 rounded-full border font-semibold uppercase tracking-[0.12em] ${ct.btn} transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]`}
               style={{
-                background: NAV_GOLD,
-                borderColor: GOLD_BORDER,
-                color: IVORY,
-                boxShadow:
-                  "0 8px 18px color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)",
+                backgroundColor: MOTIF_BURGUNDY,
+                borderColor: `color-mix(in srgb, ${MOTIF_FOREST} 32%, transparent)`,
+                color: TEXT_ON_BURGUNDY,
+                boxShadow: "0 8px 18px color-mix(in srgb, #531314 35%, transparent)",
               }}
               aria-label={`Get directions to ${badge.toLowerCase()} venue`}
             >
@@ -652,14 +556,14 @@ function EventVenueCard({
               onClick={() => onCopy(fullVenue, copyId)}
               className={`${cinzel.className} flex-1 flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2.5 sm:py-3 md:py-3.5 border-2 rounded-full font-semibold uppercase tracking-[0.12em] ${ct.btn} transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]`}
               style={{
-                color: NAVY,
+                color: MOTIF_FOREST,
                 backgroundColor: IVORY,
-                borderColor: GOLD_BORDER,
+                borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`,
               }}
               aria-label={`Copy ${badge.toLowerCase()} venue address`}
             >
               {copiedItems.has(copyId) ? (
-                <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0" style={{ color: GOLD }} />
+                <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0" style={{ color: MOTIF_BURGUNDY }} />
               ) : (
                 <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0" />
               )}
@@ -672,23 +576,12 @@ function EventVenueCard({
   )
 }
 
-// Colors sourced from globals.css @theme inline — edit there to update everywhere
-
-const COUPLE_IMAGES = [
-  "/envelope/boxes (5).JPG",
-  "/envelope/boxes (2).JPG",
-  "/envelope/boxes (3).JPG",
-  "/envelope/boxes (4).JPG",
-]
-
 export function Details() {
   const siteConfig = useSiteConfig()
   const [copiedItems, setCopiedItems] = useState<Set<string>>(new Set())
   const [currentCeremonyImageIndex, setCurrentCeremonyImageIndex] = useState(0)
   const [currentReceptionImageIndex, setCurrentReceptionImageIndex] = useState(0)
   const [showImageModal, setShowImageModal] = useState<string | null>(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [rotationOffset, setRotationOffset] = useState(0)
 
   const ceremonyImages = siteConfig.ceremony.image
   const receptionImages = siteConfig.reception.image
@@ -708,16 +601,6 @@ export function Details() {
     }, 4500)
     return () => clearInterval(timer)
   }, [receptionImages.length])
-
-  // Gentle reminders couple photos — subtle carousel + wobble animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % COUPLE_IMAGES.length)
-      setRotationOffset((prev) => (prev + 10) % 360)
-    }, 2600)
-
-    return () => clearInterval(interval)
-  }, [])
 
   const copyToClipboard = async (text: string, itemId: string) => {
     try {
@@ -764,79 +647,73 @@ export function Details() {
 
 
   return (
-    <div
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative w-full`}
-      style={{ background: sectionBackground }}
-    >
-      <Section
+    <>
+      <section
         id="details"
-        className="relative z-10 pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-12 md:pb-12 lg:pt-14 lg:pb-14 overflow-hidden"
+        className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative z-10 w-full scroll-mt-16 overflow-hidden bg-[#0a1410] pb-16 pt-16 sm:scroll-mt-20 sm:pb-20 sm:pt-20 md:scroll-mt-24 md:pb-24 md:pt-24`}
       >
-        {/* Corner decorations */}
-        <div className="pointer-events-none absolute left-0 top-0 z-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/decoration/top-left-corner.png"
-            alt=""
-            aria-hidden="true"
-            className={CORNER_DECO_CLASS}
-          />
-        </div>
-        <div className="pointer-events-none absolute right-0 top-0 z-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/decoration/top-right-corner.png"
-            alt=""
-            aria-hidden="true"
-            className={CORNER_DECO_CLASS}
-          />
-        </div>
-        <div className="pointer-events-none absolute bottom-0 left-0 z-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/decoration/deco/bottom-left.png"
-            alt=""
-            aria-hidden="true"
-            className={CORNER_DECO_CLASS}
-          />
-        </div>
-        <div className="pointer-events-none absolute bottom-0 right-0 z-10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/decoration/deco/bottom-right.png"
-            alt=""
-            aria-hidden="true"
-            className={CORNER_DECO_CLASS}
-          />
-        </div>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={cornerTextureBackgroundStyle}
+          aria-hidden
+        />
+        <img
+          src="/corner/left-top-corner.png"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute left-0 top-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-left-top sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+        />
+        <img
+          src="/corner/right-top-corner.png"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute right-0 top-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-right-top sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+        />
+        <img
+          src="/corner/left-bottom-corner.png"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 left-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-left-bottom sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+        />
+        <img
+          src="/corner/right-bottom-corner.png"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 right-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-right-bottom sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+        />
 
-        {/* Header */}
-        <div className="relative z-20 mb-8 px-3 text-center sm:mb-10 sm:px-4 md:mb-12">
+        <div className="relative z-20 mx-auto mb-8 max-w-7xl px-5 text-center sm:mb-10 sm:px-8 md:mb-12 md:px-10 lg:px-12">
           <div className="mx-auto mb-4 sm:mb-5 md:mb-6">
-            <OutsideDivider />
+            <OutsideDivider tone="light" />
           </div>
           <p
             className={`${cinzel.className} mx-auto mt-4 max-w-[20rem] px-2 text-[0.6875rem] font-semibold leading-snug tracking-[0.12em] min-[400px]:max-w-none min-[400px]:text-[0.75rem] min-[400px]:tracking-[0.16em] sm:mt-6 sm:text-[0.9375rem] sm:tracking-[0.2em] md:text-base md:tracking-[0.22em]`}
-            style={{ color: GOLD }}
+            style={{
+              color: "color-mix(in srgb, #ffffff 88%, transparent)",
+              textShadow: "0 1px 8px rgba(0, 0, 0, 0.45)",
+            }}
           >
-            Our Celebration
+            Our celebration
           </p>
           <div className="mx-auto mt-3 sm:mt-4 md:mt-5">
-            <DetailsTitle />
+            <DetailsTitle onDark />
           </div>
           <p
             className={`font-goudy-italic mx-auto mt-4 max-w-xl px-2 sm:mt-5 md:mt-6 ${sectionType.textRelaxed}`}
-            style={{ color: BODY }}
+            style={{
+              color: "color-mix(in srgb, #ffffff 90%, transparent)",
+              textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
+            }}
           >
-            Everything you need for the day.
+            Ceremony, reception, attire, and gentle reminders for the day.
           </p>
           <div className="mt-4 flex items-center justify-center sm:mt-5">
-            <span className="h-px w-16 sm:w-24 md:w-32" style={goldDividerStyle} />
+            <span className="h-px w-16 sm:w-24 md:w-32" style={{ background: dividerFadeLight }} />
           </div>
         </div>
 
       {/* Venue and Event Information */}
-      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 md:px-8 mb-8 sm:mb-10 md:mb-12 space-y-6 sm:space-y-10 md:space-y-14">
+      <div className="relative z-20 mx-auto mb-8 max-w-7xl space-y-6 px-5 sm:mb-10 sm:space-y-10 sm:px-8 md:mb-12 md:space-y-14 md:px-10 lg:px-12">
         <EventVenueCard
           badge="Ceremony"
           images={ceremonyImages}
@@ -879,26 +756,33 @@ export function Details() {
       </div>
 
       {/* Attire Guidelines */}
-      <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+      <div className="relative z-20 mx-auto max-w-7xl px-5 sm:px-8 md:px-10 lg:px-12">
         <div className="text-center mb-8 sm:mb-10 md:mb-12">
           <SectionIconDivider
+            tone="light"
             icon={
               <Shirt
                 className="h-3.5 w-3.5 sm:h-4 sm:w-4"
-                style={{ color: GOLD }}
+                style={{ color: TEXT_WHITE }}
                 aria-hidden
               />
             }
           />
           <h3
             className={`${theSeasons.className} ${ct.sectionTitle} mt-3 uppercase font-semibold leading-tight tracking-[0.12em] sm:mt-4 md:tracking-[0.15em]`}
-            style={{ color: NAVY }}
+            style={{
+              color: TEXT_WHITE,
+              textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
+            }}
           >
             Attire Guidelines
           </h3>
           <p
             className={`font-goudy-italic ${ct.bodyLg} mt-3 leading-relaxed sm:mt-4`}
-            style={{ color: BODY }}
+            style={{
+              color: "color-mix(in srgb, #ffffff 92%, transparent)",
+              textShadow: "0 1px 8px rgba(0, 0, 0, 0.45)",
+            }}
           >
             Kindly follow the look below.
           </p>
@@ -934,15 +818,9 @@ export function Details() {
             style={cardStyle}
           >
             <div className="relative z-10 px-4 py-5 text-center sm:px-6 sm:py-6">
-              <CoupleImagesCarousel
-                coupleImages={COUPLE_IMAGES}
-                currentImageIndex={currentImageIndex}
-                rotationOffset={rotationOffset}
-              />
-
               <h3
                 className={`${theSeasons.className} ${ct.sectionTitle} uppercase font-semibold tracking-[0.12em] md:tracking-[0.15em]`}
-                style={{ color: NAVY }}
+                style={{ color: detailText.heading }}
               >
                 Gentle Reminders
               </h3>
@@ -965,7 +843,7 @@ export function Details() {
                   </p>
                 </ReminderCard>
 
-                <ReminderCard title="Whimsical Spring Minimalist Attire" variant="accent">
+                <ReminderCard title="Guest Attire" variant="accent">
                   <p>
                     Kindly follow our suggested attire and color palette above to match our wedding
                     theme. Please refrain from wearing rubber shoes.
@@ -1192,7 +1070,7 @@ export function Details() {
           </div>
         </div>
       )}
-      </Section>
-    </div>
+      </section>
+    </>
   )
 }

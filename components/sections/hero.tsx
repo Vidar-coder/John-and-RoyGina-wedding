@@ -1,345 +1,55 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
 import { Cinzel, Playfair_Display } from "next/font/google"
-import localFont from "next/font/local"
 import { useSiteConfig } from "@/hooks/use-site-config"
+import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { parseWeddingDate } from "@/lib/wedding-date"
 
 const cinzel = Cinzel({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-hero-cinzel",
 })
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["400", "500"],
   style: ["normal", "italic"],
 })
 
-const theSeasons = localFont({
-  src: "../../Font/Fontspring-DEMO-theseasons-reg.otf",
-  display: "swap",
-  variable: "--font-the-seasons",
-})
-
-const aboveTheBeyond = localFont({
-  src: "../../Font/above-the-beyond-script.otf",
-  display: "swap",
-  variable: "--font-above-beyond",
-})
-
-const IVORY = "#fffaf4"
-const CHAMPAGNE = "#E8D5A3"
-const GOLD_BRIGHT = "#d4af37"
 const entryEase = [0.22, 1, 0.36, 1] as const
-const heroTitleSize = {
-  mainMobile: "clamp(2.2rem, 11.5vw, 3.15rem)",
-  main: "clamp(3.85rem, min(21vw, 26cqi), 10rem)",
-  scriptMobile: "clamp(1.75rem, 9.5vw, 2.65rem)",
-  script: "clamp(3.1rem, min(17vw, 19cqi), 7.5rem)",
-} as const
 
-const goldGradientText: React.CSSProperties = {
-  background:
-    "linear-gradient(168deg, #fffef8 0%, #fceabb 14%, #f5d76e 32%, #c9a227 48%, #a67c00 54%, #e8c547 70%, #fff8dc 86%, #d4af37 100%)",
-  WebkitBackgroundClip: "text",
-  backgroundClip: "text",
-  color: "transparent",
-  filter:
-    "drop-shadow(0 1px 0 rgba(139, 105, 20, 0.85)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 20px rgba(255, 215, 100, 0.4))",
+const TEXT_WHITE = "#ffffff"
+const IVORY = "#fffaf4"
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_BTN = `linear-gradient(180deg, color-mix(in srgb, ${MOTIF_BURGUNDY} 90%, #000) 0%, ${MOTIF_BURGUNDY} 52%, color-mix(in srgb, ${MOTIF_BURGUNDY} 88%, #000) 100%)`
+const dividerFade = "color-mix(in srgb, #ffffff 42%, transparent)"
+
+function scrollToSection(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
 }
 
-interface TimeLeft {
-  days: number
-  hours: number
-  minutes: number
-  seconds: number
-}
-
-function pad2(n: number) {
-  return String(n).padStart(2, "0")
-}
-
-function formatCeremonyTimePhrase(raw: string) {
-  const match = raw.trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?/i)
-  if (!match) return raw.toUpperCase()
-
-  let hour24 = Number(match[1])
-  const minutes = match[2] ?? "00"
-  const meridiem = (match[3] || "").toUpperCase()
-
-  if (meridiem === "PM" && hour24 !== 12) hour24 += 12
-  if (meridiem === "AM" && hour24 === 12) hour24 = 0
-
-  const period =
-    hour24 >= 17 ? "IN THE EVENING" : hour24 >= 12 ? "IN THE AFTERNOON" : "IN THE MORNING"
-
-  let displayHour = hour24 % 12
-  if (displayHour === 0) displayHour = 12
-
-  return `${displayHour}:${minutes} ${period}`
-}
-
-function useCeremonyCountdown() {
-  const siteConfig = useSiteConfig()
-
-  const targetTimestamp = useMemo(() => {
-    const parsedDate = parseWeddingDate(siteConfig.ceremony.date ?? siteConfig.wedding.date)
-    const monthMap: Record<string, string> = {
-      January: "01",
-      February: "02",
-      March: "03",
-      April: "04",
-      May: "05",
-      June: "06",
-      July: "07",
-      August: "08",
-      September: "09",
-      October: "10",
-      November: "11",
-      December: "12",
-    }
-    const monthKey =
-      parsedDate.month.charAt(0) + parsedDate.month.slice(1).toLowerCase()
-    const monthNum = monthMap[monthKey] ?? "11"
-    const timeRaw = siteConfig.ceremony.time ?? siteConfig.wedding.time
-    const timeMatch = timeRaw.match(/(\d+):(\d+)\s*(AM|PM)/i)
-
-    let hour = 9
-    let minutes = 0
-    if (timeMatch) {
-      hour = parseInt(timeMatch[1], 10)
-      minutes = parseInt(timeMatch[2], 10)
-      const ampm = timeMatch[3].toUpperCase()
-      if (ampm === "PM" && hour !== 12) hour += 12
-      if (ampm === "AM" && hour === 12) hour = 0
-    }
-
-    return new Date(
-      Date.UTC(
-        parseInt(parsedDate.year, 10),
-        parseInt(monthNum, 10) - 1,
-        parseInt(parsedDate.day, 10),
-        hour - 8,
-        minutes,
-        0,
-      ),
-    ).getTime()
-  }, [
-    siteConfig.ceremony.date,
-    siteConfig.ceremony.time,
-    siteConfig.wedding.date,
-    siteConfig.wedding.time,
-  ])
-
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  })
-
-  useEffect(() => {
-    const tick = () => {
-      const difference = targetTimestamp - Date.now()
-      if (difference <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
-        return
-      }
-      setTimeLeft({
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      })
-    }
-
-    tick()
-    const timer = window.setInterval(tick, 1000)
-    return () => window.clearInterval(timer)
-  }, [targetTimestamp])
-
-  return timeLeft
-}
-
-function CountdownUnit({
-  value,
-  label,
-  pad = false,
-}: {
-  value: number
-  label: string
-  pad?: boolean
-}) {
-  const display = pad ? pad2(value) : String(value)
-
+function VenueDivider() {
   return (
-    <div className="flex min-w-[3rem] flex-1 flex-col items-center sm:min-w-[3.5rem]">
+    <div className="mt-3 flex w-full items-center justify-center gap-1.5 sm:mt-3.5">
       <span
-        className={`${cinzel.className} text-[clamp(1.2rem,5.4vw,1.75rem)] font-semibold leading-none tabular-nums tracking-[0.04em] text-[#fffaf4]`}
-      >
-        {display}
-      </span>
-      <span
-        className={`${cinzel.className} mt-1.5 text-[0.48rem] font-medium uppercase tracking-[0.16em] text-[#fffaf4] sm:mt-2 sm:text-[0.54rem]`}
-      >
-        {label}
-      </span>
-    </div>
-  )
-}
-
-function GoldRule({ className = "" }: { className?: string }) {
-  return (
-    <div
-      className={`mx-auto flex max-w-xs items-center justify-center gap-2 sm:max-w-sm ${className}`}
-      aria-hidden
-    >
-      <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#d4af37]/70 to-transparent" />
-      <span className="h-1 w-1 rotate-45 bg-[#d4af37]" />
-      <span className="h-px flex-1 bg-gradient-to-l from-transparent via-[#d4af37]/70 to-transparent" />
-    </div>
-  )
-}
-
-function HeroDateFeature({
-  weekday,
-  day,
-  monthLabel,
-  year,
-  venueLine,
-}: {
-  weekday: string
-  day: string
-  monthLabel: string
-  year: string
-  venueLine: string
-}) {
-  const dateAria = `${monthLabel} ${day}, ${year}`
-
-  return (
-    <div
-      className="relative mx-auto mt-6 w-full max-w-2xl px-1 sm:mt-7"
-      role="group"
-      aria-label={`Wedding date ${dateAria}, ${venueLine}`}
-    >
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[min(16rem,55vw)] w-[min(28rem,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-90 blur-3xl"
+        className="h-px w-12 sm:w-16"
+        style={{ background: dividerFade }}
         aria-hidden
-        style={{
-          background: `radial-gradient(ellipse 80% 65% at 50% 50%, color-mix(in srgb, ${GOLD_BRIGHT} 28%, transparent), transparent 68%)`,
-        }}
       />
-      <p
-        className={`${cinzel.className} relative text-center text-[0.58rem] font-semibold uppercase tracking-[0.4em] text-[#f5e6a8] sm:text-[0.65rem] sm:tracking-[0.46em]`}
-      >
-        Save the date
-      </p>
-      <p
-        className={`${cinzel.className} relative mt-3 text-center text-[0.62rem] font-medium uppercase tracking-[0.22em] text-[#fffaf4]/85 sm:mt-3.5 sm:text-[0.7rem] sm:tracking-[0.26em]`}
-      >
-        {weekday}
-      </p>
-      <p
-        className={`${playfair.className} relative mt-2 text-center text-[clamp(3rem,16vw,6rem)] font-semibold italic leading-[0.92] tabular-nums tracking-[0.01em] sm:mt-2.5`}
-        style={goldGradientText}
-      >
-        {day}
-      </p>
-      <p
-        className={`${theSeasons.className} relative mt-1 text-center text-[clamp(1.35rem,6.5vw,2.75rem)] uppercase leading-none tracking-[0.12em] text-[#fff8dc] sm:tracking-[0.16em]`}
-        style={{
-          textShadow:
-            "0 2px 16px rgb(42 34 28 / 55%), 0 0 28px color-mix(in srgb, #d4af37 30%, transparent)",
-        }}
-      >
-        {monthLabel}
-      </p>
-      <p
-        className={`${cinzel.className} relative mt-1.5 text-center text-[clamp(0.95rem,4vw,1.35rem)] font-semibold uppercase tracking-[0.32em] sm:tracking-[0.38em]`}
-        style={goldGradientText}
-      >
-        {year}
-      </p>
-      <p
-        className={`${cinzel.className} relative mt-4 text-center text-[0.58rem] font-medium uppercase leading-relaxed tracking-[0.18em] text-[#fffaf4]/90 sm:mt-4 sm:text-[0.65rem] sm:tracking-[0.22em]`}
-      >
-        {venueLine}
-      </p>
-    </div>
-  )
-}
-
-function CoupleNameCopy({
-  groom,
-  bride,
-  groomNickname,
-  brideNickname,
-}: {
-  groom: string
-  bride: string
-  groomNickname?: string
-  brideNickname?: string
-}) {
-  const groomLabel = groomNickname?.trim() || groom.split(/\s+/)[0] || groom
-  const brideLabel = brideNickname?.trim() || bride.split(/\s+/)[0] || bride
-
-  return (
-    <div className="mx-auto max-w-md px-2 text-center">
-      <p
-        className={`${cinzel.className} text-[0.52rem] font-semibold uppercase tracking-[0.32em] text-[#f5e6a8]/90 sm:text-[0.56rem] sm:tracking-[0.36em]`}
-      >
-        The wedding of
-      </p>
-      <p
-        className={`${theSeasons.className} mt-2 text-[clamp(1rem,4.2vw,1.35rem)] uppercase leading-snug tracking-[0.14em] text-[#fffaf4]/88 sm:mt-2.5 sm:tracking-[0.18em]`}
-        style={{ textShadow: "0 2px 12px rgb(42 34 28 / 48%)" }}
-      >
-        <span>{groomLabel}</span>
-        <span
-          className={`${aboveTheBeyond.className} mx-2 inline-block text-[clamp(1.2rem,4.8vw,1.65rem)] normal-case tracking-normal text-[#E8D5A3]`}
-          aria-hidden
-        >
-          &amp;
-        </span>
-        <span>{brideLabel}</span>
-      </p>
-    </div>
-  )
-}
-
-function HeroCountdown() {
-  const timeLeft = useCeremonyCountdown()
-  const colonClass = `${cinzel.className} shrink-0 self-start px-0.5 text-[clamp(1.2rem,5.4vw,1.75rem)] font-semibold leading-none tabular-nums text-[#fffaf4] sm:px-1`
-
-  return (
-    <div className="relative z-10 w-full px-4 py-4 sm:px-6 sm:py-5">
-      <p
-        className={`${cinzel.className} text-center text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#fffaf4] sm:text-[0.64rem] sm:tracking-[0.26em]`}
-      >
-        Until we begin our forever
-      </p>
-      <div
-        className="mx-auto mt-2 flex max-w-md items-start justify-center text-[#fffaf4] sm:mt-2.5 sm:max-w-lg"
-        aria-live="polite"
-        aria-label={`${timeLeft.days} days, ${timeLeft.hours} hours, ${timeLeft.minutes} minutes, ${timeLeft.seconds} seconds`}
-      >
-        <CountdownUnit value={timeLeft.days} label="Days" />
-        <span className={colonClass} aria-hidden="true">
-          :
-        </span>
-        <CountdownUnit value={timeLeft.hours} label="Hours" pad />
-        <span className={colonClass} aria-hidden="true">
-          :
-        </span>
-        <CountdownUnit value={timeLeft.minutes} label="Minutes" pad />
-        <span className={colonClass} aria-hidden="true">
-          :
-        </span>
-        <CountdownUnit value={timeLeft.seconds} label="Seconds" pad />
-      </div>
+      <span
+        className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1"
+        style={{ backgroundColor: dividerFade }}
+        aria-hidden
+      />
+      <span
+        className="h-px w-12 sm:w-16"
+        style={{ background: dividerFade }}
+        aria-hidden
+      />
     </div>
   )
 }
@@ -354,138 +64,192 @@ export function Hero() {
     return () => window.clearTimeout(id)
   }, [])
 
-  const parsedDate = useMemo(
-    () => parseWeddingDate(siteConfig.ceremony.date ?? siteConfig.wedding.date),
-    [siteConfig.ceremony.date, siteConfig.wedding.date],
-  )
+  const coupleAlt = `${siteConfig.couple.groomNickname} and ${siteConfig.couple.brideNickname}`
 
-  const weddingDate = new Date(`${parsedDate.month} ${parsedDate.day}, ${parsedDate.year}`)
-  const monthTitle =
-    parsedDate.month.charAt(0) + parsedDate.month.slice(1).toLowerCase()
+  const ceremonyMeta = useMemo(() => {
+    const ceremonyDate = siteConfig.ceremony.date ?? siteConfig.wedding.date
+    const parsedDate = parseWeddingDate(ceremonyDate)
+    const ceremonyTimeDisplay = siteConfig.ceremony.time ?? siteConfig.wedding.time
+    const timeStr = ceremonyTimeDisplay.split(",")[0].trim()
+    const ceremonyDay = siteConfig.ceremony.day || parsedDate.dayOfWeek
+    const ceremonyDayShort = ceremonyDay.slice(0, 3).toUpperCase()
+    const ceremonyWhere =
+      siteConfig.ceremony.location?.trim() ||
+      siteConfig.ceremony.venue?.trim() ||
+      siteConfig.wedding.venue?.trim() ||
+      ""
 
-  const ceremonyTimePhrase = formatCeremonyTimePhrase(
-    siteConfig.ceremony.time ?? siteConfig.wedding.time,
-  )
-  const ceremonyName =
-    siteConfig.ceremony.location || siteConfig.wedding.venue
-
-  const weekdayLabel = parsedDate.dayOfWeek
-    ? parsedDate.dayOfWeek.toUpperCase()
-    : weddingDate.toLocaleDateString("en-US", { weekday: "long" }).toUpperCase()
+    return {
+      month: parsedDate.month.toUpperCase(),
+      dayNumber: parsedDate.day,
+      year: parsedDate.year,
+      dayShort: ceremonyDayShort,
+      timeStr,
+      venueUpper: ceremonyWhere.toUpperCase(),
+    }
+  }, [siteConfig])
 
   const fadeUp = (delay: number) => {
     if (reduceMotion) {
       return { initial: false as const, animate: { opacity: 1, y: 0 } }
     }
     return {
-      initial: { opacity: 0, y: 18 },
-      animate: visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
+      initial: { opacity: 0, y: 14 },
+      animate: visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
       transition: { duration: 0.9, delay, ease: entryEase },
     }
   }
 
+  const lineMuted = dividerFade
+
   return (
     <section
       id="home"
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative -mt-12 flex min-h-[100dvh] w-full flex-col overflow-hidden bg-transparent sm:-mt-14 md:-mt-16`}
+      className={`${cinzel.variable} relative -mt-12 flex min-h-[100dvh] w-full flex-col overflow-hidden bg-[#0a1410] sm:-mt-14 md:-mt-16`}
     >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={cornerTextureBackgroundStyle}
+        aria-hidden
+      />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-6 pt-[max(clamp(3.75rem,14vw,5.5rem),calc(3rem+env(safe-area-inset-top)))] text-center sm:px-8 sm:py-8">
-        <div className="flex w-full max-w-3xl flex-col items-center justify-center md:max-w-4xl">
-        <motion.div
-          className={`${cinzel.className} inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[0.52rem] font-semibold uppercase tracking-[0.28em] text-[#f5e6a8] sm:px-4 sm:py-2 sm:text-[0.58rem] sm:tracking-[0.32em]`}
-          style={{
-            borderColor: "color-mix(in srgb, #d4af37 45%, transparent)",
-            background: "rgb(42 34 28 / 52%)",
-            boxShadow: "0 0 24px color-mix(in srgb, #d4af37 18%, transparent)",
-          }}
-          {...fadeUp(0.04)}
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37] shadow-[0_0_10px_#d4af37]" aria-hidden />
-          Official website
-        </motion.div>
-
-        <motion.div className="mt-3 w-full sm:mt-3.5" {...fadeUp(0.1)}>
-          <CoupleNameCopy
-            groom={siteConfig.couple.groom}
-            bride={siteConfig.couple.bride}
-            groomNickname={siteConfig.couple.groomNickname}
-            brideNickname={siteConfig.couple.brideNickname}
-          />
-        </motion.div>
-
-        <motion.h1
-          className="relative mx-auto mt-5 flex w-full max-w-4xl flex-col items-center justify-center gap-0 px-1 text-center @container sm:mt-6 md:max-w-5xl"
-          style={
-            {
-              "--hero-title-size-mobile": heroTitleSize.mainMobile,
-              "--hero-title-size": heroTitleSize.main,
-              "--hero-script-size-mobile": heroTitleSize.scriptMobile,
-              "--hero-script-size": heroTitleSize.script,
-            } as React.CSSProperties
-          }
-          {...fadeUp(0.16)}
-        >
-          <span className="sr-only">Coming soon — official wedding website</span>
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[min(18rem,62vw)] w-[min(32rem,100%)] -translate-x-1/2 -translate-y-1/2 rounded-full sm:h-[min(24rem,78vw)] sm:w-[min(38rem,100%)]"
+      <div className="relative z-10 mx-auto flex w-full max-w-lg flex-1 flex-col px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-[max(clamp(3.25rem,11vw,4.5rem),calc(2.5rem+env(safe-area-inset-top)))] sm:max-w-xl sm:px-6 md:max-w-2xl">
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
+          <motion.p
+            {...fadeUp(0.04)}
+            className={`${playfair.className} mx-auto mt-4 max-w-[19rem] text-[clamp(0.8rem,3.4vw,0.95rem)] font-normal italic leading-[1.65] sm:mt-5 sm:max-w-xs md:max-w-sm`}
             style={{
-              background: `radial-gradient(ellipse 78% 65% at 50% 50%, color-mix(in srgb, ${GOLD_BRIGHT} 30%, transparent), transparent 68%)`,
-            }}
-          />
-          <span
-            aria-hidden
-            className={`${theSeasons.className} relative z-10 block w-full max-w-full text-center uppercase leading-[0.92] tracking-[0.05em] [font-size:var(--hero-title-size-mobile)] min-[400px]:tracking-[0.08em] sm:leading-[0.94] sm:tracking-[0.12em] sm:[font-size:var(--hero-title-size)] md:tracking-[0.14em]`}
-            style={{
-              ...goldGradientText,
-              filter:
-                "drop-shadow(0 1px 0 rgba(139, 105, 20, 0.85)) drop-shadow(0 3px 14px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 36px rgba(255, 215, 100, 0.6))",
+              color: "color-mix(in srgb, #ffffff 92%, transparent)",
+              textShadow: "0 1px 12px rgba(0, 0, 0, 0.65)",
             }}
           >
-            Coming
-          </span>
-          <span
-            aria-hidden
-            className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-1 block w-fit max-w-full px-2 leading-[1] [font-size:var(--hero-script-size-mobile)] sm:mt-1.5 sm:[font-size:var(--hero-script-size)] md:mt-2`}
+            Together with our families, we joyfully invite you to witness our union.
+          </motion.p>
+
+          <motion.div
+            {...fadeUp(0.18)}
+            className="mt-7 flex w-full justify-center sm:mt-8 md:mt-9"
+          >
+            <Image
+              src="/deco/couple-name.png"
+              alt={coupleAlt}
+              width={1493}
+              height={838}
+              priority
+              sizes="(min-width: 768px) 420px, 90vw"
+              className="h-auto w-[min(90vw,20.5rem)] max-w-full object-contain object-center sm:w-[min(88vw,24rem)] md:w-[min(42vw,28rem)]"
+              style={{
+                filter:
+                  "brightness(0) invert(1) drop-shadow(0 2px 14px rgba(0, 0, 0, 0.5))",
+              }}
+            />
+          </motion.div>
+
+          <motion.div
+            {...fadeUp(0.26)}
+            className={`${cinzel.className} mt-8 flex w-full max-w-md flex-col items-center gap-1.5 font-bold sm:mt-9 sm:gap-2 md:mt-10`}
+            style={{ color: TEXT_WHITE }}
+          >
+            <span className="text-[0.62rem] uppercase tracking-[0.38em] sm:text-[0.68rem] sm:tracking-[0.44em]">
+              {ceremonyMeta.month}
+            </span>
+
+            <div className="flex w-full items-center gap-1.5 sm:gap-3">
+              <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-2">
+                <span className="h-[0.5px] flex-1" style={{ background: lineMuted }} />
+                <span className="text-[0.58rem] uppercase tracking-[0.28em] sm:text-[0.65rem] sm:tracking-[0.34em]">
+                  {ceremonyMeta.dayShort}
+                </span>
+                <span className="h-[0.5px] w-5 sm:w-7" style={{ background: lineMuted }} />
+              </div>
+
+              <div className="relative flex shrink-0 items-center justify-center px-2 sm:px-3">
+                <span
+                  className="pointer-events-none absolute inset-0 -z-10 m-auto h-[3.25rem] w-[3.25rem] rounded-full bg-white/20 blur-xl sm:h-[4.5rem] sm:w-[4.5rem] md:h-[5rem] md:w-[5rem]"
+                  aria-hidden
+                />
+                <span className="relative text-[clamp(2.75rem,14vw,4.25rem)] font-bold leading-none tracking-wider sm:text-[4rem] md:text-[4.75rem]">
+                  {ceremonyMeta.dayNumber}
+                </span>
+              </div>
+
+              <div className="flex flex-1 items-center gap-1.5 sm:gap-2">
+                <span className="h-[0.5px] w-5 sm:w-7" style={{ background: lineMuted }} />
+                <span className="text-[0.58rem] uppercase tracking-[0.22em] sm:text-[0.65rem] sm:tracking-[0.28em]">
+                  {ceremonyMeta.timeStr}
+                </span>
+                <span className="h-[0.5px] flex-1" style={{ background: lineMuted }} />
+              </div>
+            </div>
+
+            <span className="text-[0.62rem] uppercase tracking-[0.38em] sm:text-[0.68rem] sm:tracking-[0.44em]">
+              {ceremonyMeta.year}
+            </span>
+
+            {ceremonyMeta.venueUpper ? (
+              <>
+                <p
+                  className={`${cinzel.className} mt-4 max-w-[17rem] text-[0.56rem] font-semibold uppercase leading-relaxed tracking-[0.16em] sm:mt-5 sm:max-w-xs sm:text-[0.6rem] sm:tracking-[0.2em] md:max-w-sm`}
+                  style={{
+                    color: TEXT_WHITE,
+                    textShadow: "0 1px 8px rgba(0, 0, 0, 0.45)",
+                  }}
+                >
+                  {ceremonyMeta.venueUpper}
+                </p>
+                <VenueDivider />
+              </>
+            ) : null}
+          </motion.div>
+
+          <motion.p
+            {...fadeUp(0.34)}
+            className={`${playfair.className} mx-auto mt-5 max-w-[18rem] text-[clamp(0.78rem,3.2vw,0.92rem)] font-normal italic leading-[1.65] sm:mt-6 sm:max-w-xs`}
             style={{
-              color: CHAMPAGNE,
-              textShadow:
-                "0 1px 0 rgb(255 250 244 / 35%), 0 6px 24px rgb(42 34 28 / 55%), 0 0 44px rgb(212 175 55 / 58%), 0 0 72px rgb(232 197 71 / 38%)",
+              color: "color-mix(in srgb, #ffffff 90%, transparent)",
+              textShadow: "0 1px 10px rgba(0, 0, 0, 0.55)",
             }}
           >
-            Soon
-          </span>
-        </motion.h1>
+            Your presence, prayers, and love will mean the world to us.
+          </motion.p>
 
-        <motion.div {...fadeUp(0.22)}>
-          <GoldRule className="mt-4 sm:mt-5" />
-        </motion.div>
-
-        <motion.div className="w-full" {...fadeUp(0.28)}>
-          <HeroDateFeature
-            weekday={weekdayLabel}
-            day={parsedDate.day}
-            monthLabel={monthTitle.toUpperCase()}
-            year={parsedDate.year}
-            venueLine={`${ceremonyName} · ${ceremonyTimePhrase}`}
-          />
-        </motion.div>
-
-        <motion.p
-          className={`${playfair.className} mx-auto mt-4 max-w-md px-3 text-[clamp(0.84rem,3.1vw,1.02rem)] font-normal italic leading-[1.65] text-[#f0e6c8]/96 sm:mt-5`}
-          style={{ textShadow: "0 1px 12px rgb(42 34 28 / 45%)" }}
-          {...fadeUp(0.34)}
-        >
-          Our full invitation is on its way — hold the date close. A tale as old as time, the
-          beginning of our forever.
-        </motion.p>
+          <motion.div
+            {...fadeUp(0.42)}
+            className="mt-7 flex w-full max-w-[min(100%,20.5rem)] flex-row justify-center gap-2.5 sm:mt-8 sm:max-w-md sm:gap-3.5"
+          >
+            <a
+              href="#guest-list"
+              onClick={(event) => {
+                event.preventDefault()
+                scrollToSection("guest-list")
+              }}
+              className={`${cinzel.className} inline-flex min-h-11 flex-1 items-center justify-center rounded-full px-5 py-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] sm:text-[0.68rem] sm:tracking-[0.16em]`}
+              style={{
+                background: MOTIF_BTN,
+                color: IVORY,
+              }}
+            >
+              RSVP
+            </a>
+            <a
+              href="#messages"
+              onClick={(event) => {
+                event.preventDefault()
+                scrollToSection("messages")
+              }}
+              className={`${cinzel.className} inline-flex min-h-11 flex-1 items-center justify-center rounded-full border px-5 py-2.5 text-[0.62rem] font-semibold uppercase tracking-[0.14em] backdrop-blur-[2px] transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] sm:text-[0.68rem] sm:tracking-[0.16em]`}
+              style={{
+                borderColor: "color-mix(in srgb, #ffffff 42%, transparent)",
+                background: "color-mix(in srgb, #ffffff 10%, transparent)",
+                color: TEXT_WHITE,
+                boxShadow: "0 6px 18px rgba(0, 0, 0, 0.28)",
+              }}
+            >
+              Message
+            </a>
+          </motion.div>
         </div>
       </div>
-
-      <motion.div className="relative z-10 mt-auto w-full" {...fadeUp(0.42)}>
-        <HeroCountdown />
-      </motion.div>
     </section>
   )
 }

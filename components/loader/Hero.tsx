@@ -15,7 +15,7 @@ import {
   type Variants,
 } from 'motion/react';
 import { useSiteConfig } from '@/hooks/use-site-config';
-import { normalizeWeddingDateString, parseWeddingDate } from '@/lib/wedding-date';
+import { parseWeddingDate } from '@/lib/wedding-date';
 import './envelope-invite.css';
 
 const HERO_SPARKLE_LAYOUT = [
@@ -147,7 +147,7 @@ const inviteRevealLeadMs = 460;
 const INVITE_EXIT_MS = 2500;
 
 const HERO_BG_VIDEO = `/background_music/${encodeURIComponent(
-  'Fast Motion Night Full of Stars 4K Relaxing Screensaver 3 online video cutter com - Vlogs Ysu (1080p) (online-video-cutter.com).mp4',
+  'green-orange-blue-yellow-bright-circles-looped-green-animated-background-relaxing-screensaver-ytmp4.savetube.vip (online-video-cutter.com).mp4',
 )}`;
 
 export const Hero: React.FC<HeroProps> = ({
@@ -213,15 +213,6 @@ export const Hero: React.FC<HeroProps> = ({
       : daysToGo === 1
         ? '1 day to go'
         : `${daysToGo} days to go`;
-
-  const weddingDateDisplay = useMemo(() => {
-    const raw = normalizeWeddingDateString(siteConfig.wedding.date) || siteConfig.wedding.date;
-    const place =
-      siteConfig.wedding.venue?.trim() ||
-      siteConfig.ceremony.location?.trim() ||
-      '';
-    return place ? `${raw} · ${place}` : raw;
-  }, [siteConfig.wedding.date, siteConfig.wedding.venue, siteConfig.ceremony.location]);
 
   const flapIsOpen =
     phase === 'flap-open' ||
@@ -626,10 +617,10 @@ export const Hero: React.FC<HeroProps> = ({
           >
           <div className="env-invite-invited-heading-wrap" aria-hidden="true">
             <Image
-              src="/image/your-are-invited.png"
+              src="/corner/youoareinvited.png"
               alt=""
-              width={2146}
-              height={733}
+              width={848}
+              height={235}
               priority
               sizes="(min-width: 768px) 360px, 88vw"
               className="env-invite-invited-heading"
@@ -697,18 +688,22 @@ export const Hero: React.FC<HeroProps> = ({
                     <div className="env-invite-letter-frame" aria-hidden="true" />
                     <div className="env-invite-letter-inner">
                       <span className="env-invite-letter-label">Save the Date</span>
-                      <span className="env-invite-letter-invited">you are invited</span>
                       <div className="env-invite-letter-couple-wrap">
                         <Image
-                          src="/image/couple-name.png"
+                          src="/deco/couple-name.png"
                           alt={coupleNames}
-                          width={1774}
-                          height={887}
+                          width={1493}
+                          height={838}
                           sizes="(min-width: 768px) 320px, 78vw"
-                          className="env-invite-letter-couple-img"
+                          className="env-invite-letter-couple-img env-invite-letter-couple-img--brand"
                         />
                       </div>
-                      <span className="env-invite-letter-date">{weddingDateDisplay}</span>
+                      <span className="env-invite-letter-date">
+                        December 2, 2026 2:30 PM
+                      </span>
+                      <span className="env-invite-letter-location">
+                        National Shrine of St. Joseph
+                      </span>
                     </div>
                   </motion.div>
                 </div>
@@ -802,29 +797,6 @@ export const Hero: React.FC<HeroProps> = ({
               </>
             )}
           </div>
-
-          <div className="env-invite-deco env-invite-deco--left" aria-hidden="true">
-            <Image
-              src="/image/decoration-image-left.png"
-              alt=""
-              width={340}
-              height={360}
-              priority
-              sizes="(min-width: 768px) 320px, 62vw"
-              className="env-invite-deco-img"
-            />
-          </div>
-          <div className="env-invite-deco env-invite-deco--right" aria-hidden="true">
-            <Image
-              src="/image/decoratoin-image-right.png"
-              alt=""
-              width={252}
-              height={400}
-              priority
-              sizes="(min-width: 768px) 252px, 44vw"
-              className="env-invite-deco-img"
-            />
-          </div>
         </motion.div>
 
           <p className="env-invite-hint">
@@ -847,19 +819,6 @@ export const Hero: React.FC<HeroProps> = ({
               : 'hidden'
         }
       >
-        <motion.div
-          className="env-invite-reveal-silhouette-wrap"
-          variants={revealCopyItemVariants}
-        >
-          <Image
-            src="/image/beauty-and-beast.png"
-            alt=""
-            width={640}
-            height={280}
-            sizes="(min-width: 768px) 200px, 46vw"
-            className="env-invite-reveal-silhouette"
-          />
-        </motion.div>
         {daysToGoLabel && (
           <motion.p
             className="env-invite-days-to-go"

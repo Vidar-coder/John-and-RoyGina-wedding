@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { motion } from "motion/react"
 import { Play } from "lucide-react"
 import { useAudio } from "@/contexts/audio-context"
+import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { layeredSectionTitleSize, sectionType } from "@/lib/section-typography"
 import localFont from "next/font/local"
 import Image from "next/image"
@@ -24,10 +25,13 @@ const aboveTheBeyond = localFont({
 const CORNER_DECO_CLASS =
   "block h-auto w-auto max-w-[120px] sm:max-w-[160px] md:max-w-[220px] lg:max-w-[260px]"
 
+const TEXT_WHITE = "#ffffff"
+const dividerFade = "color-mix(in srgb, #ffffff 42%, transparent)"
+
 const palette = {
-  body: "var(--color-welcome-text)",
-  heading: "var(--color-welcome-navy)",
-  accent: "var(--color-welcome-green)",
+  body: "color-mix(in srgb, #ffffff 90%, transparent)",
+  heading: TEXT_WHITE,
+  accent: "color-mix(in srgb, #fffaf4 96%, white)",
 } as const
 
 const cardStyle = {
@@ -50,21 +54,13 @@ declare global {
 function OrnamentalDivider() {
   return (
     <div className="flex items-center justify-center gap-1.5">
+      <span className="h-px w-6 sm:w-10" style={{ background: dividerFade }} aria-hidden />
       <span
-        className="h-px w-6 sm:w-10"
-        style={{
-          background:
-            "linear-gradient(to right, transparent, color-mix(in srgb, var(--color-motif-deep) 38%, transparent))",
-        }}
+        className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1"
+        style={{ backgroundColor: dividerFade }}
+        aria-hidden
       />
-      <span className="h-0.5 w-0.5 rounded-full bg-motif-deep/45 sm:h-1 sm:w-1" aria-hidden />
-      <span
-        className="h-px w-6 sm:w-10"
-        style={{
-          background:
-            "linear-gradient(to left, transparent, color-mix(in srgb, var(--color-motif-deep) 38%, transparent))",
-        }}
-      />
+      <span className="h-px w-6 sm:w-10" style={{ background: dividerFade }} aria-hidden />
     </div>
   )
 }
@@ -85,6 +81,7 @@ function CoupleVideoTitle() {
         style={{
           fontSize: "var(--title-size)",
           color: palette.heading,
+          textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
         }}
       >
         A Glimpse of Our Love
@@ -95,8 +92,7 @@ function CoupleVideoTitle() {
         style={{
           fontSize: "var(--script-size)",
           color: palette.accent,
-          textShadow:
-            "0 1px 0 color-mix(in srgb, var(--color-welcome-bg) 95%, white), 0 0 10px color-mix(in srgb, var(--color-welcome-bg) 65%, white)",
+          textShadow: "0 1px 12px rgba(0, 0, 0, 0.55)",
         }}
       >
         Our Journey Together
@@ -111,8 +107,8 @@ export function CoupleVideo() {
   const playerRef = useRef<any>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const { pauseMusic, resumeMusic } = useAudio()
-  //https://youtu.be/nhzVs-HhId4
-  const videoId = "nhzVs-HhId4"
+  // https://youtu.be/cH-cndt3U3c
+  const videoId = "cH-cndt3U3c"
 
   useEffect(() => {
     if (!window.YT) {
@@ -208,9 +204,13 @@ export function CoupleVideo() {
 
       <section
         id="couple-video"
-        className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative overflow-hidden px-4 pb-10 pt-8 sm:pb-12 sm:pt-10 md:pb-16 md:pt-12`}
-        style={{ background: "var(--color-welcome-bg)" }}
+        className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative overflow-hidden bg-[#0a1410] px-4 pb-10 pt-8 sm:pb-12 sm:pt-10 md:pb-16 md:pt-12`}
       >
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={cornerTextureBackgroundStyle}
+          aria-hidden
+        />
         <div className="pointer-events-none absolute left-0 top-0 z-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -255,7 +255,7 @@ export function CoupleVideo() {
             </div>
             <p
               className={`font-goudy-italic mx-auto mt-4 max-w-xl sm:mt-5 md:mt-6 ${sectionType.textSnug}`}
-              style={{ color: palette.body }}
+              style={{ color: palette.body, textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)" }}
             >
               Watch the journey that brought our hearts together
             </p>
@@ -297,7 +297,7 @@ export function CoupleVideo() {
                       onClick={handleThumbnailClick}
                     >
                       <Image
-                        src="/desktop-background/couples (32).webp"
+                        src="/corner/thumnail.png"
                         alt="Video thumbnail"
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
@@ -403,7 +403,7 @@ export function CoupleVideo() {
               </div>
               <p
                 className={`font-goudy-italic mx-auto max-w-lg px-4 ${sectionType.textSnug}`}
-                style={{ color: palette.heading }}
+                style={{ color: palette.body, textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)" }}
               >
                 A glimpse into the moments that made our hearts one
               </p>

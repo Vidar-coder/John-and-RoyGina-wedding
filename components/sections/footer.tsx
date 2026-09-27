@@ -5,8 +5,8 @@ import { motion } from "motion/react"
 import localFont from "next/font/local"
 import { Instagram, Twitter, Facebook, Music2 } from "lucide-react"
 import { useSiteConfig } from "@/hooks/use-site-config"
+import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { sectionType } from "@/lib/section-typography"
-import { sectionBackground } from "@/lib/section-background"
 import { Cinzel } from "next/font/google"
 import Image from "next/image"
 
@@ -27,20 +27,24 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
+const MOTIF_BURGUNDY = "#531314"
+const IVORY = "#fffaf4"
+const TEXT_ON_BURGUNDY = IVORY
+const TEXT_WHITE = "#ffffff"
+const dividerFadeLight = "color-mix(in srgb, #ffffff 42%, transparent)"
+const textShadowSoft = "0 1px 10px rgba(0, 0, 0, 0.45)"
+
+const containerBorder = `color-mix(in srgb, #ffffff 28%, transparent)`
+const borderSoft = `color-mix(in srgb, #ffffff 18%, transparent)`
+
+const MOTIF_BTN = `linear-gradient(180deg, color-mix(in srgb, ${MOTIF_BURGUNDY} 90%, #000) 0%, ${MOTIF_BURGUNDY} 52%, color-mix(in srgb, ${MOTIF_BURGUNDY} 88%, #000) 100%)`
+
 const palette = {
-  body: "var(--color-welcome-text)",
-  heading: "var(--color-welcome-navy)",
-  label: "var(--color-welcome-heading)",
-  accent: "var(--color-welcome-green)",
+  body: "color-mix(in srgb, #ffffff 90%, transparent)",
+  heading: TEXT_WHITE,
+  label: "color-mix(in srgb, #fffaf4 92%, white)",
+  accent: IVORY,
 } as const
-
-const dividerLineStyle = {
-  background:
-    "linear-gradient(to right, transparent, color-mix(in srgb, var(--color-motif-deep) 38%, transparent), transparent)",
-} as const
-
-const CORNER_DECO_CLASS =
-  "block h-auto w-auto max-w-[80px] sm:max-w-[120px] md:max-w-[170px] lg:max-w-[205px] xl:max-w-[245px] select-none"
 
 const ct = {
   label: sectionType.label,
@@ -51,21 +55,21 @@ const ct = {
 } as const
 
 const cardStyle = {
-  background: "var(--color-welcome-bg)",
+  background: "color-mix(in srgb, #ffffff 9%, transparent)",
   borderWidth: "1px",
   borderStyle: "solid",
-  borderColor: "color-mix(in srgb, var(--color-motif-deep) 14%, transparent)",
-  boxShadow:
-    "0 8px 28px color-mix(in srgb, var(--color-motif-deep) 7%, transparent), inset 0 1px 0 color-mix(in srgb, white 70%, transparent)",
+  borderColor: containerBorder,
+  boxShadow: "0 12px 32px color-mix(in srgb, #000 28%, transparent)",
+  backdropFilter: "blur(6px)",
 } as const
 
 const socialLinkStyle = {
   borderWidth: "1px",
   borderStyle: "solid",
-  borderColor: "color-mix(in srgb, var(--color-motif-deep) 18%, transparent)",
-  backgroundColor: "var(--color-welcome-bg-soft)",
-  color: "var(--color-welcome-green)",
-  boxShadow: "0 4px 12px color-mix(in srgb, var(--color-motif-deep) 10%, transparent)",
+  borderColor: borderSoft,
+  backgroundColor: "color-mix(in srgb, #ffffff 10%, transparent)",
+  color: TEXT_WHITE,
+  boxShadow: "0 4px 14px color-mix(in srgb, #000 22%, transparent)",
 } as const
 
 const FOOTER_QUOTES = [
@@ -78,25 +82,19 @@ const LONGEST_FOOTER_QUOTE = FOOTER_QUOTES.reduce((longest, quote) =>
   quote.length > longest.length ? quote : longest
 )
 
-const toTitleCase = (str: string) =>
-  str
-    .toLowerCase()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-
 function FooterCoupleNames({ groom, bride }: { groom: string; bride: string }) {
   return (
     <h2
       className={`${cinzel.className} mx-auto whitespace-nowrap text-center ${sectionType.subheader} font-semibold tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.18em]`}
-      style={{ color: "var(--color-welcome-navy)" }}
+      style={{ color: palette.heading, textShadow: textShadowSoft }}
     >
       {groom}
       <span
         className={`${aboveTheBeyond.className} mx-2 inline-block normal-case tracking-normal sm:mx-2.5`}
         style={{
           fontSize: "1.35em",
-          color: "var(--color-welcome-green)",
+          color: palette.accent,
+          textShadow: textShadowSoft,
           verticalAlign: "middle",
         }}
         aria-hidden
@@ -117,13 +115,9 @@ function FooterCard({
 }) {
   return (
     <div
-      className={`relative w-full min-w-0 rounded-xl sm:rounded-2xl backdrop-blur-xl sm:backdrop-blur-2xl p-4 sm:p-5 md:p-6 transition-all duration-300 hover:shadow-xl ${className}`}
+      className={`relative w-full min-w-0 rounded-[1.85rem] p-4 transition-all duration-300 hover:shadow-[0_14px_36px_color-mix(in_srgb,#000_32%,transparent)] sm:p-5 md:p-6 ${className}`}
       style={cardStyle}
     >
-      <div
-        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-white/35 via-white/8 to-transparent"
-        aria-hidden
-      />
       <div className="relative z-[1] min-w-0">{children}</div>
     </div>
   )
@@ -140,11 +134,14 @@ function DetailRow({
     <div className="space-y-0.5">
       <p
         className={`${cinzel.className} ${ct.label} uppercase tracking-[0.14em] font-semibold`}
-        style={{ color: palette.label }}
+        style={{ color: palette.label, textShadow: textShadowSoft }}
       >
         {label}
       </p>
-      <p className={`font-goudy-italic ${ct.body}`} style={{ color: palette.body }}>
+      <p
+        className={`font-goudy-italic ${ct.body}`}
+        style={{ color: palette.body, textShadow: textShadowSoft }}
+      >
         {value}
       </p>
     </div>
@@ -219,107 +216,90 @@ export function Footer() {
 
   return (
     <div
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative w-full overflow-hidden`}
-      style={{ background: sectionBackground }}
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative w-full overflow-hidden bg-[#0a1410]`}
     >
-      {/* Corner decorations */}
-      <div className="pointer-events-none absolute left-0 top-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/top-left-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute right-0 top-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/top-right-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute bottom-0 left-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/bottom-left-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute bottom-0 right-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/bottom-right-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={cornerTextureBackgroundStyle}
+        aria-hidden
+      />
+      <img
+        src="/corner/left-top-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-left-top sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
+      <img
+        src="/corner/right-top-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute right-0 top-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-right-top sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
+      <img
+        src="/corner/left-bottom-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-left-bottom sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
+      <img
+        src="/corner/right-bottom-corner.png"
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 right-0 z-[1] h-auto w-[min(30vw,7.5rem)] object-contain object-right-bottom sm:w-[min(26vw,9rem)] md:w-[min(22vw,11rem)] lg:w-[min(18vw,12.5rem)]"
+      />
 
-      <footer className="relative z-20 pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-12 md:pb-12 lg:pt-14 lg:pb-14">
-        {/* Monogram + couple header */}
-        <div className="relative z-10 flex flex-col items-center mb-6 sm:mb-8 md:mb-10 px-6 sm:px-10">
+      <footer className="relative z-20 pb-16 pt-16 sm:pb-20 sm:pt-20 md:pb-24 md:pt-24">
+        <div className="relative z-10 mb-6 flex flex-col items-center px-6 sm:mb-8 md:mb-10 sm:px-10">
           <motion.div
             initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex flex-col items-center"
           >
-            <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72">
+            <div className="relative h-44 w-44 sm:h-56 sm:w-56 md:h-64 md:w-64 lg:h-72 lg:w-72">
               <Image
                 src={siteConfig.couple.monogram}
                 alt={`${coupleDisplayName} monogram`}
                 fill
                 className="object-contain"
+                style={{ filter: "brightness(0) invert(1) drop-shadow(0 2px 14px rgba(0, 0, 0, 0.45))" }}
               />
             </div>
           </motion.div>
 
           <div className="mt-4 max-w-md text-center sm:mt-5 md:mt-6">
             {/* <FooterCoupleNames groom={groomName} bride={brideName} /> */}
-            {/* <p
-              className={`font-goudy-italic mt-2 sm:mt-3 ${sectionType.text}`}
-              style={{ color: "var(--color-welcome-text)" }}
-            >
-              {ceremonyDate}
-            </p> */}
           </div>
 
           <div className="flex items-center justify-center pt-3 sm:pt-4">
-            <span className="h-px w-16 sm:w-24 md:w-32" style={dividerLineStyle} />
+            <span className="h-px w-16 sm:w-24 md:w-32" style={{ background: dividerFadeLight }} />
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 @container/footer sm:px-6 md:px-8 pb-4 sm:pb-6 min-w-0">
+        <div className="relative z-10 mx-auto flex max-w-7xl min-w-0 flex-col items-center px-4 pb-4 @container/footer sm:px-6 sm:pb-6 md:px-8">
           <motion.div
-            className="grid grid-cols-1 lg:grid-cols-4 gap-5 sm:gap-6 md:gap-8 mb-8 sm:mb-10 items-start"
+            className="mb-8 grid grid-cols-1 items-start gap-5 sm:mb-10 sm:gap-6 md:gap-8 lg:grid-cols-4"
             variants={staggerChildren}
             initial="initial"
             animate="animate"
           >
-            {/* Couple info + quote */}
-            <motion.div className="lg:col-span-2 min-w-0" variants={fadeInUp}>
+            <motion.div className="min-w-0 lg:col-span-2" variants={fadeInUp}>
               <div className="mb-5 sm:mb-6">
                 <h3
-                  className={`${cinzel.className} ${ct.title} font-semibold leading-tight mb-4`}
-                  style={{ color: palette.heading }}
+                  className={`${cinzel.className} ${ct.title} mb-4 font-semibold leading-tight`}
+                  style={{ color: palette.heading, textShadow: textShadowSoft }}
                 >
                   {coupleDisplayName}
                 </h3>
                 <div className="space-y-3 sm:space-y-4">
                   <DetailRow label="Wedding Date" value={ceremonyDate} />
-                  {/* <DetailRow label="Venue" value={toTitleCase(ceremonyVenue)} /> */}
                 </div>
               </div>
 
               <FooterCard>
                 <p
-                  className={`${cinzel.className} ${ct.label} uppercase tracking-[0.14em] font-semibold mb-3`}
-                  style={{ color: palette.label }}
+                  className={`${cinzel.className} ${ct.label} mb-3 font-semibold uppercase tracking-[0.14em]`}
+                  style={{ color: palette.label, textShadow: textShadowSoft }}
                 >
                   A Note From Us
                 </p>
@@ -329,24 +309,24 @@ export function Footer() {
                   </span>
                   <span
                     className="absolute inset-0"
-                    style={{ color: palette.body }}
+                    style={{ color: palette.body, textShadow: textShadowSoft }}
                     aria-live="polite"
                   >
                     &ldquo;{displayedText}
                     <span
                       className="ml-1 inline-block h-4 w-0.5 animate-pulse align-middle sm:h-5"
-                      style={{ backgroundColor: "var(--color-welcome-green)" }}
+                      style={{ backgroundColor: TEXT_WHITE }}
                     />
                     &rdquo;
                   </span>
                 </blockquote>
-                <div className="flex items-center gap-1.5 mt-3 sm:mt-4">
+                <div className="mt-3 flex items-center gap-1.5 sm:mt-4">
                   {FOOTER_QUOTES.map((_, i) => (
                     <div
                       key={i}
-                      className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-opacity"
+                      className="h-1.5 w-1.5 rounded-full transition-opacity sm:h-2 sm:w-2"
                       style={{
-                        backgroundColor: palette.accent,
+                        backgroundColor: TEXT_WHITE,
                         opacity: i === currentQuoteIndex ? 1 : 0.35,
                       }}
                     />
@@ -355,15 +335,20 @@ export function Footer() {
               </FooterCard>
             </motion.div>
 
-            {/* RSVP + event info */}
-            <motion.div className="space-y-4 sm:space-y-5 min-w-0" variants={fadeInUp}>
+            <motion.div className="min-w-0 space-y-4 sm:space-y-5" variants={fadeInUp}>
               <FooterCard>
-                <h4 className={`${cinzel.className} ${ct.cardTitle} font-semibold mb-3`} style={{ color: palette.heading }}>
+                <h4
+                  className={`${cinzel.className} ${ct.cardTitle} mb-3 font-semibold`}
+                  style={{ color: palette.heading, textShadow: textShadowSoft }}
+                >
                   RSVP Deadline
                 </h4>
                 <div className="space-y-2">
                   <DetailRow label="Please respond by" value={siteConfig.details.rsvp.deadline} />
-                  <p className={`font-goudy-italic ${ct.body} opacity-90`} style={{ color: palette.body }}>
+                  <p
+                    className={`font-goudy-italic ${ct.body} opacity-90`}
+                    style={{ color: palette.body, textShadow: textShadowSoft }}
+                  >
                     Please confirm your attendance by this date.
                   </p>
                   <a
@@ -372,11 +357,10 @@ export function Footer() {
                       event.preventDefault()
                       document.getElementById("guest-list")?.scrollIntoView({ behavior: "smooth", block: "start" })
                     }}
-                    className={`${cinzel.className} ${ct.label} mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-full px-5 py-2.5 font-semibold uppercase tracking-[0.12em] transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] sm:tracking-[0.14em]`}
+                    className={`${cinzel.className} ${ct.label} mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-full px-5 py-2.5 font-semibold uppercase tracking-[0.12em] shadow-[0_8px_18px_color-mix(in_srgb,#531314_28%,transparent)] transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] sm:tracking-[0.14em]`}
                     style={{
-                      background: "linear-gradient(180deg, #E8D5A3 0%, #CDB072 52%, #C4A265 100%)",
-                      color: "#fffaf4",
-                      boxShadow: "0 8px 18px color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)",
+                      background: MOTIF_BTN,
+                      color: TEXT_ON_BURGUNDY,
                     }}
                   >
                     Tap here to respond
@@ -385,20 +369,19 @@ export function Footer() {
               </FooterCard>
             </motion.div>
 
-            {/* Social + links */}
-            <motion.div className="space-y-5 sm:space-y-6 min-w-0" variants={fadeInUp}>
+            <motion.div className="min-w-0 space-y-5 sm:space-y-6" variants={fadeInUp}>
               <div>
                 <h4
-                  className={`${cinzel.className} ${ct.cardTitle} font-semibold mb-3 sm:mb-4 flex items-center gap-2`}
-                  style={{ color: palette.heading }}
+                  className={`${cinzel.className} ${ct.cardTitle} mb-3 flex items-center gap-2 font-semibold sm:mb-4`}
+                  style={{ color: palette.heading, textShadow: textShadowSoft }}
                 >
                   <span
                     className="h-6 w-1.5 flex-shrink-0 rounded-full sm:h-7"
-                    style={{ backgroundColor: "var(--color-welcome-green)" }}
+                    style={{ backgroundColor: "color-mix(in srgb, #ffffff 75%, transparent)" }}
                   />
                   Follow Us
                 </h4>
-                <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                   {(
                     [
                       { href: "https://www.facebook.com", Icon: Facebook, label: "Facebook" },
@@ -416,7 +399,7 @@ export function Footer() {
                       style={socialLinkStyle}
                       aria-label={label}
                     >
-                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <Icon className="h-4 w-4 sm:w-5 sm:h-5" />
                     </a>
                   ))}
                 </div>
@@ -424,8 +407,8 @@ export function Footer() {
 
               <div>
                 <h5
-                  className={`${cinzel.className} ${ct.label} font-semibold mb-2.5 sm:mb-3 uppercase tracking-[0.14em]`}
-                  style={{ color: palette.label }}
+                  className={`${cinzel.className} ${ct.label} mb-2.5 font-semibold uppercase tracking-[0.14em] sm:mb-3`}
+                  style={{ color: palette.label, textShadow: textShadowSoft }}
                 >
                   Quick Links
                 </h5>
@@ -434,8 +417,8 @@ export function Footer() {
                     <a
                       key={item.href}
                       href={item.href}
-                      className={`font-goudy-italic block ${ct.body} transition-colors duration-200 hover:opacity-80`}
-                      style={{ color: palette.body }}
+                      className={`font-goudy-italic block ${ct.body} transition-colors duration-200 hover:text-white hover:opacity-100`}
+                      style={{ color: palette.body, textShadow: textShadowSoft }}
                     >
                       {item.label}
                     </a>
@@ -445,47 +428,53 @@ export function Footer() {
             </motion.div>
           </motion.div>
 
-          {/* Bottom bar */}
           <motion.div
-            className="pt-6 sm:pt-8 border-t"
-            style={{
-              borderColor: "color-mix(in srgb, var(--color-motif-deep) 14%, transparent)",
-            }}
+            className="border-t pt-6 sm:pt-8"
+            style={{ borderColor: borderSoft }}
             variants={fadeInUp}
           >
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
-              <div className="text-center md:text-left min-w-0">
-                <p className={`font-goudy-italic ${ct.body}`} style={{ color: palette.body }}>
+            <div className="flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
+              <div className="min-w-0 text-center md:text-left">
+                <p
+                  className={`font-goudy-italic ${ct.body}`}
+                  style={{ color: palette.body, textShadow: textShadowSoft }}
+                >
                   © {year} {coupleDisplayName} — crafted with love, prayers, and gratitude.
                 </p>
                 <p
                   className={`font-goudy-italic ${ct.body} mt-1 opacity-90`}
-                  style={{ color: palette.body }}
+                  style={{ color: palette.body, textShadow: textShadowSoft }}
                 >
                   This celebration site was designed to share our story and joy with you.
                 </p>
               </div>
               <div className="min-w-0 space-y-1 text-center md:text-right">
-                <p className={`font-goudy-italic ${ct.body} opacity-90`} style={{ color: palette.body }}>
+                <p
+                  className={`font-goudy-italic ${ct.body} opacity-90`}
+                  style={{ color: palette.body, textShadow: textShadowSoft }}
+                >
                   Developed by{" "}
                   <a
                     href="https://lance28-beep.github.io/portfolio-website/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-semibold underline transition-colors hover:opacity-80"
-                    style={{ color: palette.accent }}
+                    className="font-semibold underline decoration-white/50 underline-offset-2 transition-colors hover:text-white"
+                    style={{ color: TEXT_WHITE }}
                   >
                     Lance Valle
                   </a>
                 </p>
-                <p className={`font-goudy-italic ${ct.body} opacity-90`} style={{ color: palette.body }}>
+                <p
+                  className={`font-goudy-italic ${ct.body} opacity-90`}
+                  style={{ color: palette.body, textShadow: textShadowSoft }}
+                >
                   Want a website like this? Visit{" "}
                   <a
                     href="https://www.facebook.com/WeddingInvitationNaga"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="underline font-semibold transition-colors hover:opacity-80"
-                    style={{ color: palette.accent }}
+                    className="font-semibold underline decoration-white/50 underline-offset-2 transition-colors hover:text-white"
+                    style={{ color: TEXT_WHITE }}
                   >
                     Wedding Invitation Naga
                   </a>

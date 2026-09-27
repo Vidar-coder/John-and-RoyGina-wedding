@@ -3,7 +3,6 @@
 import type React from "react"
 import { useSiteConfig } from "@/hooks/use-site-config"
 import type { SiteConfig } from "@/lib/site-config"
-import { sectionBackground } from "@/lib/section-background"
 import { motion } from "motion/react"
 import { Cinzel } from "next/font/google"
 import localFont from "next/font/local"
@@ -26,24 +25,34 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
-const CORNER_DECO_CLASS =
-  "block h-auto w-auto max-w-[80px] sm:max-w-[120px] md:max-w-[170px] lg:max-w-[205px] xl:max-w-[245px] select-none"
-
-const IVORY = "#fffaf4"
-const GOLD = "var(--color-welcome-gold)"
-const NAVY = "var(--color-welcome-navy)"
-const SCRIPT = "var(--color-welcome-green)"
-const BODY = "var(--color-welcome-text)"
+const TEXT_WHITE = "#ffffff"
+const dividerFade = "color-mix(in srgb, #ffffff 42%, transparent)"
 const entryEase = [0.22, 1, 0.36, 1] as const
 
-const TIMELINE_SVG_STROKE = "#C4A265"
-
-const goldDividerStyle = {
-  background: "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
+const scriptGlow = {
+  textShadow: "0 1px 2px rgba(0, 0, 0, 0.35), 0 0 12px rgba(0, 0, 0, 0.2)",
 } as const
 
-const goldDividerStyleLeft = {
-  background: "linear-gradient(to left, transparent, var(--color-welcome-gold), transparent)",
+const TIMELINE_SVG_STROKE = TEXT_WHITE
+
+/** Renders timeline PNG icons as white silhouettes on the dark backdrop */
+const timelineImageFilter =
+  "brightness(0) invert(1) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35))"
+
+const dividerLineStyle = {
+  background: `linear-gradient(to right, transparent, ${dividerFade}, transparent)`,
+} as const
+
+const dividerLineStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${dividerFade}, transparent)`,
+} as const
+
+const connectorLineStyle = {
+  background: `linear-gradient(to right, transparent, ${dividerFade})`,
+} as const
+
+const connectorLineStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${dividerFade})`,
 } as const
 
 type TimelineIcon = React.ComponentType<React.SVGProps<SVGSVGElement>>
@@ -60,9 +69,9 @@ interface TimelineEvent {
 function OutsideDivider() {
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyle} />
-      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: GOLD }} aria-hidden />
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyle} />
+      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: dividerFade }} aria-hidden />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyleLeft} />
     </div>
   )
 }
@@ -82,9 +91,9 @@ function TimelineKicker() {
   return (
     <p
       className={`${cinzel.className} mx-auto mt-4 max-w-[20rem] px-2 text-[0.6875rem] font-semibold leading-snug tracking-[0.12em] min-[400px]:max-w-none min-[400px]:text-[0.75rem] min-[400px]:tracking-[0.16em] sm:mt-6 sm:text-[0.875rem] sm:tracking-[0.2em] md:text-[0.9375rem] md:tracking-[0.22em]`}
-      style={{ color: GOLD }}
+      style={{ color: TEXT_WHITE }}
     >
-      Join us as we tie the knot!
+      Our schedule for the celebration
     </p>
   )
 }
@@ -106,7 +115,7 @@ function TimelineTitle() {
         className={`${theSeasons.className} block uppercase leading-[0.9] tracking-[0.04em] min-[400px]:tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.14em]`}
         style={{
           fontSize: "var(--title-size)",
-          color: NAVY,
+          color: TEXT_WHITE,
         }}
       >
         Timeline
@@ -116,12 +125,11 @@ function TimelineTitle() {
         className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-1.5 block w-fit max-w-[min(100%,22rem)] px-1 leading-[0.88] sm:mt-2 sm:max-w-none sm:leading-[0.9]`}
         style={{
           fontSize: "var(--script-size)",
-          color: SCRIPT,
-          textShadow:
-            "0 1px 0 color-mix(in srgb, var(--color-welcome-bg) 95%, white), 0 0 10px color-mix(in srgb, var(--color-welcome-bg) 65%, white)",
+          color: TEXT_WHITE,
+          ...scriptGlow,
         }}
       >
-        our wedding day
+        on our wedding day
       </span>
     </h2>
   )
@@ -182,52 +190,10 @@ export function WeddingTimeline() {
   const timelineEvents = buildTimelineEvents(siteConfig)
 
   return (
-    <div
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative w-full`}
-      style={{ background: sectionBackground }}
-    >
     <section
       id="wedding-timeline"
-      className="relative z-10 overflow-hidden py-10 sm:py-12 md:py-16 lg:py-20"
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative z-10 overflow-hidden bg-transparent px-3 py-10 sm:px-5 sm:py-12 md:px-6 md:py-16 lg:py-20`}
     >
-      {/* Corner decorations */}
-      <div className="pointer-events-none absolute left-0 top-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/top-left-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute right-0 top-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/top-right-corner.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute bottom-0 left-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/deco/bottom-left.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-      <div className="pointer-events-none absolute bottom-0 right-0 z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/decoration/deco/bottom-right.png"
-          alt=""
-          aria-hidden="true"
-          className={CORNER_DECO_CLASS}
-        />
-      </div>
-
       {/* Header */}
       <div className="relative z-20 mx-auto mb-8 max-w-5xl px-3 text-center @container/timeline sm:mb-10 sm:px-4 md:mb-12">
         <div className="mx-auto mb-4 sm:mb-5 md:mb-6">
@@ -241,12 +207,12 @@ export function WeddingTimeline() {
         </div>
         <p
           className={`font-goudy-italic mx-auto mt-4 max-w-xl px-2 sm:mt-5 md:mt-6 ${timelineType.textRelaxed}`}
-          style={{ color: BODY }}
+          style={{ color: TEXT_WHITE }}
         >
-          From the first arrival to the last farewell, here is how we will spend this day together.
+          From arrival through ceremony and reception, here is how we hope to spend the day with you.
         </p>
         <div className="mt-4 flex items-center justify-center sm:mt-5">
-          <span className="h-px w-16 sm:w-24 md:w-32" style={goldDividerStyle} />
+          <span className="h-px w-16 sm:w-24 md:w-32" style={dividerLineStyle} />
         </div>
       </div>
 
@@ -259,8 +225,7 @@ export function WeddingTimeline() {
           viewport={{ once: true, amount: 0.12 }}
           transition={{ duration: 1.2, ease: entryEase }}
           style={{
-            background:
-              "linear-gradient(to bottom, transparent, color-mix(in srgb, var(--color-welcome-gold) 72%, transparent), transparent)",
+            background: `linear-gradient(to bottom, transparent, ${dividerFade}, transparent)`,
           }}
         />
 
@@ -273,25 +238,24 @@ export function WeddingTimeline() {
 
       <div className="relative z-20 mx-auto mt-8 max-w-xl px-3 text-center sm:mt-10 md:mt-12">
         <div className="mb-5 flex items-center justify-center sm:mb-6">
-          <span className="h-px w-16 sm:w-24 md:w-32" style={goldDividerStyle} />
+          <span className="h-px w-16 sm:w-24 md:w-32" style={dividerLineStyle} />
         </div>
         <blockquote>
           <p
             className={`font-goudy-italic ${timelineType.textRelaxed} italic leading-relaxed`}
-            style={{ color: BODY }}
+            style={{ color: TEXT_WHITE }}
           >
             &ldquo;At the right time, I, the Lord, will make it happen.&rdquo;
           </p>
           <footer
-            className={`font-goudy-italic mt-2 sm:mt-3 ${timelineType.label} not-italic tracking-wide`}
-            style={{ color: SCRIPT }}
+            className={`${cinzel.className} mt-2 sm:mt-3 ${timelineType.label} not-italic uppercase tracking-[0.2em]`}
+            style={{ color: TEXT_WHITE }}
           >
-            — Isaiah 60:22
+            Isaiah 60:22
           </footer>
         </blockquote>
       </div>
     </section>
-    </div>
   )
 }
 
@@ -316,33 +280,18 @@ function TimelineItem({ event, index }: { event: TimelineEvent; index: number })
             ) : (
               <IconMark Icon={Icon} imageSrc={event.imageSrc} />
             )}
-            <div
-              className="hidden h-px w-10 lg:block"
-              style={{
-                background:
-                  "linear-gradient(to right, transparent, color-mix(in srgb, var(--color-welcome-gold) 55%, transparent))",
-              }}
-            />
+            <div className="hidden h-px w-10 lg:block" style={connectorLineStyle} />
           </div>
         </div>
 
         <div className="relative flex items-center justify-center">
-          <span
-            className="absolute h-4 w-4 rounded-full"
-            style={{ background: "color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)" }}
-          />
-          <div className="relative h-2 w-2 rounded-full" style={{ background: GOLD }} />
+          <span className="absolute h-4 w-4 rounded-full" style={{ background: dividerFade }} />
+          <div className="relative h-2 w-2 rounded-full" style={{ background: TEXT_WHITE }} />
         </div>
 
         <div>
           <div className="flex items-center justify-start gap-4">
-            <div
-              className="hidden h-px w-10 lg:block"
-              style={{
-                background:
-                  "linear-gradient(to left, transparent, color-mix(in srgb, var(--color-welcome-gold) 55%, transparent))",
-              }}
-            />
+            <div className="hidden h-px w-10 lg:block" style={connectorLineStyleLeft} />
             {isEven ? (
               <TimelineText event={event} align="left" />
             ) : (
@@ -360,33 +309,18 @@ function TimelineItem({ event, index }: { event: TimelineEvent; index: number })
             ) : (
               <IconMark Icon={Icon} imageSrc={event.imageSrc} mobile />
             )}
-            <div
-              className="h-px w-6"
-              style={{
-                background:
-                  "linear-gradient(to right, transparent, color-mix(in srgb, var(--color-welcome-gold) 55%, transparent))",
-              }}
-            />
+            <div className="h-px w-6" style={connectorLineStyle} />
           </div>
         </div>
 
         <div className="relative flex items-center justify-center">
-          <span
-            className="absolute h-4 w-4 rounded-full"
-            style={{ background: "color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)" }}
-          />
-          <div className="relative h-2 w-2 rounded-full" style={{ background: GOLD }} />
+          <span className="absolute h-4 w-4 rounded-full" style={{ background: dividerFade }} />
+          <div className="relative h-2 w-2 rounded-full" style={{ background: TEXT_WHITE }} />
         </div>
 
         <div>
           <div className="flex items-center justify-start gap-3">
-            <div
-              className="h-px w-6"
-              style={{
-                background:
-                  "linear-gradient(to left, transparent, color-mix(in srgb, var(--color-welcome-gold) 55%, transparent))",
-              }}
-            />
+            <div className="h-px w-6" style={connectorLineStyleLeft} />
             {isEven ? (
               <TimelineText event={event} align="left" />
             ) : (
@@ -412,13 +346,13 @@ function TimelineText({
     <div className={`max-w-md ${textAlign} ${align === "right" ? "ml-auto" : "mr-auto"}`}>
       <p
         className={`${cinzel.className} ${timelineType.label} font-semibold tracking-[0.2em] uppercase`}
-        style={{ color: GOLD }}
+        style={{ color: TEXT_WHITE }}
       >
         {event.time}
       </p>
       <p
         className={`${theSeasons.className} mt-1 text-[0.95rem] leading-tight tracking-[0.04em] sm:text-[1.175rem]`}
-        style={{ color: NAVY }}
+        style={{ color: TEXT_WHITE }}
       >
         {event.title}
       </p>
@@ -426,7 +360,7 @@ function TimelineText({
       {event.description && (
         <p
           className={`font-goudy-italic ${timelineType.textRelaxed} mt-1.5`}
-          style={{ color: BODY }}
+          style={{ color: TEXT_WHITE }}
         >
           {event.description}
         </p>
@@ -434,8 +368,8 @@ function TimelineText({
 
       {event.location && (
         <p
-          className={`font-goudy-italic ${timelineType.text} mt-1.5 leading-relaxed`}
-          style={{ color: BODY }}
+          className={`font-goudy-italic ${timelineType.text} mt-1.5 leading-relaxed opacity-90`}
+          style={{ color: TEXT_WHITE }}
         >
           {event.location}
         </p>
@@ -463,7 +397,7 @@ function IconMark({
         className={`${
           mobile ? "h-16 w-16" : "h-18 w-18 lg:h-22 lg:w-22"
         } object-contain`}
-        style={{ filter: "drop-shadow(0 2px 6px color-mix(in srgb, var(--color-welcome-gold) 28%, transparent))" }}
+        style={{ filter: timelineImageFilter }}
       />
     )
   }
@@ -474,13 +408,13 @@ function IconMark({
         mobile ? "h-14 w-14" : "h-16 w-16 lg:h-18 lg:w-18"
       } flex items-center justify-center rounded-full border`}
       style={{
-        background: IVORY,
-        borderColor: "color-mix(in srgb, var(--color-welcome-gold) 38%, transparent)",
+        background: "transparent",
+        borderColor: dividerFade,
       }}
     >
       <Icon
         className={`${mobile ? "h-7 w-7" : "h-8 w-8 lg:h-9 lg:w-9"}`}
-        style={{ color: GOLD }}
+        style={{ color: TEXT_WHITE }}
       />
     </div>
   )

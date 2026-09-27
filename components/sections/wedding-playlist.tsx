@@ -6,12 +6,6 @@ import { useAudio } from "@/contexts/audio-context"
 import { Cinzel } from "next/font/google"
 import localFont from "next/font/local"
 import { Music2 } from "lucide-react"
-import {
-  sectionBackground,
-  sectionDividerLineStyle,
-  sectionDividerLineStyleLeft,
-  sectionText,
-} from "@/lib/section-background"
 
 interface SpotifyPlaybackUpdate {
   playingURI: string
@@ -86,6 +80,44 @@ function loadSpotifyIframeApi(onReady: (api: SpotifyIframeApi) => void) {
   }
 }
 
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_FOREST = "#052312"
+const IVORY = "#fffaf4"
+const MOTIF_CREAM = "#f4f0e8"
+const TEXT_WHITE = "#ffffff"
+const TEXT_WHITE_SOFT = "color-mix(in srgb, #ffffff 82%, transparent)"
+const TEXT_ON_BURGUNDY = IVORY
+const dividerFade = "color-mix(in srgb, #ffffff 42%, transparent)"
+const containerBorder = `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`
+
+/** Section header — white on invitation backdrop */
+const palette = {
+  body: TEXT_WHITE_SOFT,
+  heading: TEXT_WHITE,
+  label: TEXT_WHITE_SOFT,
+  accent: TEXT_WHITE,
+} as const
+
+/** Inside ivory playlist card */
+const containerPalette = {
+  body: `color-mix(in srgb, ${MOTIF_FOREST} 78%, #4a5c4e)`,
+  heading: MOTIF_FOREST,
+  label: MOTIF_BURGUNDY,
+  accent: MOTIF_BURGUNDY,
+} as const
+
+const scriptGlow = {
+  textShadow: "0 1px 2px rgba(0, 0, 0, 0.35), 0 0 12px rgba(0, 0, 0, 0.2)",
+} as const
+
+const dividerLineStyle = {
+  background: `linear-gradient(to right, transparent, ${dividerFade}, transparent)`,
+} as const
+
+const dividerLineStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${dividerFade}, transparent)`,
+} as const
+
 const cinzel = Cinzel({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
@@ -103,12 +135,6 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
-const palette = {
-  heading: sectionText.heading,
-} as const
-
-const outsideDividerLineStyle = sectionDividerLineStyle
-
 const ct = {
   body: "text-xs sm:text-sm md:text-base",
   bodyLg: "text-sm sm:text-base md:text-lg",
@@ -116,20 +142,23 @@ const ct = {
 } as const
 
 const cardStyle = {
-  background: "var(--color-welcome-bg)",
+  background: IVORY,
   borderWidth: "1px",
   borderStyle: "solid",
-  borderColor: "color-mix(in srgb, var(--color-motif-deep) 14%, transparent)",
-  boxShadow:
-    "0 8px 28px color-mix(in srgb, var(--color-motif-deep) 7%, transparent), inset 0 1px 0 color-mix(in srgb, white 70%, transparent)",
+  borderColor: containerBorder,
+  boxShadow: "0 10px 28px color-mix(in srgb, #052312 10%, transparent)",
 } as const
 
 function OutsideDivider() {
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <span className="h-px w-6 sm:w-10" style={outsideDividerLineStyle} />
-      <span className="h-0.5 w-0.5 rounded-full bg-motif-deep/45 sm:h-1 sm:w-1" aria-hidden />
-      <span className="h-px w-6 sm:w-10" style={sectionDividerLineStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyle} />
+      <span
+        className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1"
+        style={{ backgroundColor: dividerFade }}
+        aria-hidden
+      />
+      <span className="h-px w-6 sm:w-10" style={dividerLineStyleLeft} />
     </div>
   )
 }
@@ -149,7 +178,7 @@ function PlaylistTitle({ title, script }: { title: string; script: string }) {
         className={`${theSeasons.className} block uppercase leading-[0.78] tracking-[0.08em] min-[400px]:tracking-[0.11em] sm:tracking-[0.15em] md:tracking-[0.18em] pb-1 sm:pb-1.5`}
         style={{
           fontSize: "var(--title-size)",
-          color: sectionText.title,
+          color: palette.heading,
         }}
       >
         {title}
@@ -159,7 +188,8 @@ function PlaylistTitle({ title, script }: { title: string; script: string }) {
         className={`${aboveTheBeyond.className} mx-auto block w-fit max-w-full px-1 leading-[0.88] sm:leading-[0.9] mt-2 sm:mt-2.5 md:mt-3`}
         style={{
           fontSize: "var(--script-size)",
-          color: sectionText.script,
+          color: palette.accent,
+          ...scriptGlow,
         }}
       >
         {script}
@@ -237,17 +267,12 @@ export function WeddingPlaylist() {
   }, [pauseMusic, resumeMusic, spotifyUri])
 
   return (
-    <div
-      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative w-full`}
-      style={{ background: sectionBackground }}
-    >
     <section
       id="playlist"
-      className="relative z-10 pt-8 pb-8 sm:pt-10 sm:pb-10 md:pt-12 md:pb-12 lg:pt-14 lg:pb-14"
+      className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative z-10 w-full scroll-mt-16 overflow-hidden bg-transparent pb-16 pt-16 sm:scroll-mt-20 sm:pb-20 sm:pt-20 md:scroll-mt-24 md:pb-24 md:pt-24`}
     >
-      <div className="relative z-20 mx-auto max-w-3xl px-4 sm:px-6 md:px-8">
-        {/* Header — outside container, white on silk */}
-        <div className="relative z-20 px-6 text-center sm:px-10 md:px-12">
+      <div className="relative z-20 mx-auto max-w-3xl px-5 sm:px-8 md:px-10 lg:px-12">
+        <div className="relative z-20 text-center">
           <div className="mx-auto mb-5 sm:mb-6 md:mb-7">
             <OutsideDivider />
           </div>
@@ -256,29 +281,23 @@ export function WeddingPlaylist() {
           </div>
           <p
             className={`font-goudy-italic ${ct.bodyLg} mx-auto mt-4 max-w-lg leading-relaxed px-2 sm:mt-5 md:mt-6`}
-            style={{ color: sectionText.body }}
+            style={{ color: palette.body }}
           >
             {subtitle}
           </p>
           <div className="flex items-center justify-center pt-3 sm:pt-4">
-            <span className="h-px w-16 sm:w-24 md:w-32 bg-motif-deep/35" />
+            <span className="h-px w-16 sm:w-24 md:w-32" style={dividerLineStyle} />
           </div>
         </div>
 
-        {/* Playlist card */}
         <div
-          className="relative mt-6 overflow-hidden rounded-xl border backdrop-blur-xl sm:mt-8 sm:rounded-2xl sm:backdrop-blur-2xl md:mt-10"
+          className="relative mt-6 overflow-hidden rounded-[1.85rem] border sm:mt-8 md:mt-10"
           style={cardStyle}
         >
-          <div
-            className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-white/35 via-white/8 to-transparent"
-            aria-hidden
-          />
-
           <div className="relative z-20 px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
             <p
               className={`${cinzel.className} mb-4 text-center text-[0.625rem] font-semibold uppercase tracking-[0.2em] sm:mb-5 sm:text-[0.6875rem] sm:tracking-[0.24em] md:text-xs`}
-              style={{ color: palette.heading }}
+              style={{ color: containerPalette.label }}
             >
               {playlistName}
             </p>
@@ -286,7 +305,11 @@ export function WeddingPlaylist() {
             <div
               ref={embedContainerRef}
               title={`${playlistName} — Spotify playlist`}
-              className="w-full min-h-[232px] overflow-hidden rounded-xl md:min-h-[352px] [&_iframe]:border-0"
+              className="w-full min-h-[232px] overflow-hidden rounded-xl border md:min-h-[352px] [&_iframe]:border-0"
+              style={{
+                borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 18%, transparent)`,
+                backgroundColor: `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
+              }}
             />
 
             <div className="mt-5 flex justify-center sm:mt-6">
@@ -294,34 +317,20 @@ export function WeddingPlaylist() {
                 href={spotifyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${cinzel.className} group relative inline-flex items-center justify-center gap-2 rounded-sm border px-6 py-2.5 font-semibold uppercase tracking-[0.2em] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:px-8 sm:py-3 sm:tracking-[0.24em] md:px-10 md:py-3.5 md:tracking-[0.28em] ${ct.btn}`}
+                className={`${cinzel.className} group inline-flex items-center justify-center gap-2 rounded-full border px-6 py-2.5 font-semibold uppercase tracking-[0.2em] shadow-[0_8px_18px_color-mix(in_srgb,#531314_35%,transparent)] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,#531314_25%,transparent)] focus-visible:ring-offset-2 sm:px-8 sm:py-3 sm:tracking-[0.24em] md:px-10 md:py-3.5 md:tracking-[0.28em] ${ct.btn}`}
                 style={{
-                  backgroundColor: "var(--color-welcome-green)",
-                  borderColor: "color-mix(in srgb, var(--color-welcome-navy) 35%, transparent)",
-                  color: "var(--color-welcome-bg)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--color-welcome-navy)"
-                  e.currentTarget.style.borderColor = "var(--color-welcome-green)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--color-welcome-green)"
-                  e.currentTarget.style.borderColor =
-                    "color-mix(in srgb, var(--color-welcome-navy) 35%, transparent)"
+                  backgroundColor: MOTIF_BURGUNDY,
+                  borderColor: `color-mix(in srgb, ${MOTIF_FOREST} 32%, transparent)`,
+                  color: TEXT_ON_BURGUNDY,
                 }}
               >
-                <Music2 className="relative z-10 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="relative z-10">Open in Spotify</span>
-                <div
-                  className="absolute inset-0 -z-0 rounded-sm opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-25"
-                  style={{ backgroundColor: "var(--color-motif-deep)" }}
-                />
+                <Music2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden />
+                Open in Spotify
               </a>
             </div>
           </div>
         </div>
       </div>
     </section>
-    </div>
   )
 }

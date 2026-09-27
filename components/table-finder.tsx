@@ -1,6 +1,15 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  Suspense,
+  type CSSProperties,
+} from "react"
+import dynamic from "next/dynamic"
 import Link from "next/link"
 import {
   AlertCircle,
