@@ -9,7 +9,7 @@ import { ClientLayout } from "@/components/client-layout"
 import { LOADING_BG_PHOTOS } from "@/lib/loading-bg-photos"
 import { anastasiaScript } from "@/lib/fonts"
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://john-and-roy-gina-wedding.vercel.app/"
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://john-calvin-and-roygina.weddinginvitationrsvp.com/"
 const canonicalUrl = siteUrl.replace(/\/$/, "")
   const desktopHero = "/image/LinkPreview.png"
 const mobileHero = "/image/LinkPreview.png"
