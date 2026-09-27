@@ -168,8 +168,8 @@ Now, as they prepare to say yes before God and the people they love most, Cather
     subtitle: "Songs that have been part of our journey together",
     playlistName: "Roygina and Joking Wedding",
     embedUrl:
-    //https://open.spotify.com/embed/playlist/2AhKS56CXqBWMYYNrnWrsR?utm_source=generator&si=2beaa29421e94943
-      "https://open.spotify.com/embed/playlist/5UlfWw7RyW2f7EkUJqKomp?utm_source=generator&si=b8c6d319057d4655",
+    //https://open.spotify.com/embed/playlist/5UlfWw7RyW2f7EkUJqKomp?utm_source=generator&si=9f8f18d67b634e04
+      "https://open.spotify.com/embed/playlist/5UlfWw7RyW2f7EkUJqKomp?utm_source=generator&si=9f8f18d67b634e04",
     spotifyUrl: "https://open.spotify.com/embed/playlist/5UlfWw7RyW2f7EkUJqKomp",
   },
   snapShare: {

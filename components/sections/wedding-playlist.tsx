@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
+import Image from "next/image"
 import { useSiteConfig } from "@/hooks/use-site-config"
 import { useAudio } from "@/contexts/audio-context"
 import { Cinzel } from "next/font/google"
@@ -44,12 +45,24 @@ declare global {
 let cachedSpotifyIframeApi: SpotifyIframeApi | null = null
 const spotifyApiReadyQueue: Array<(api: SpotifyIframeApi) => void> = []
 
-function getSpotifyUri(spotifyUrl: string): string {
+function getSpotifyParts(spotifyUrl: string) {
   const match = spotifyUrl.match(
-    /open\.spotify\.com\/(playlist|album|track|episode)\/([^/?]+)/
+    /open\.spotify\.com\/(?:embed\/)?(playlist|album|track|episode)\/([^/?]+)/
   )
-  if (!match) return spotifyUrl
-  return `spotify:${match[1]}:${match[2]}`
+  if (!match) return null
+  return { type: match[1], id: match[2] }
+}
+
+function getSpotifyUri(spotifyUrl: string): string {
+  const parts = getSpotifyParts(spotifyUrl)
+  if (!parts) return spotifyUrl
+  return `spotify:${parts.type}:${parts.id}`
+}
+
+function getSpotifyOpenUrl(spotifyUrl: string): string {
+  const parts = getSpotifyParts(spotifyUrl)
+  if (!parts) return spotifyUrl
+  return `https://open.spotify.com/${parts.type}/${parts.id}`
 }
 
 function loadSpotifyIframeApi(onReady: (api: SpotifyIframeApi) => void) {
@@ -203,10 +216,26 @@ export function WeddingPlaylist() {
   const siteConfig = useSiteConfig()
   const { title, subtitle, playlistName, spotifyUrl } = siteConfig.playlist
   const spotifyUri = getSpotifyUri(spotifyUrl)
+  const spotifyOpenUrl = getSpotifyOpenUrl(spotifyUrl)
+  const [coverUrl, setCoverUrl] = useState<string | null>(null)
   const embedContainerRef = useRef<HTMLDivElement>(null)
   const controllerRef = useRef<SpotifyEmbedController | null>(null)
   const playbackStateRef = useRef<"playing" | "paused">("paused")
   const { pauseMusic, resumeMusic } = useAudio()
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(spotifyOpenUrl)}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { thumbnail_url?: string } | null) => {
+        if (!cancelled && data?.thumbnail_url) setCoverUrl(data.thumbnail_url)
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [spotifyOpenUrl])
 
   useEffect(() => {
     const container = embedContainerRef.current
@@ -295,6 +324,30 @@ export function WeddingPlaylist() {
           style={cardStyle}
         >
           <div className="relative z-20 px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
+            {/* <div className="mx-auto mb-5 w-[min(68%,13.5rem)] sm:mb-6 sm:w-56 md:w-64">
+              <div
+                className="relative aspect-square overflow-hidden rounded-2xl border shadow-[0_12px_28px_color-mix(in_srgb,#052312_14%,transparent)]"
+                style={{ borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 28%, transparent)` }}
+              >
+                {coverUrl ? (
+                  <Image
+                    src={coverUrl}
+                    alt={`${playlistName} cover`}
+                    fill
+                    sizes="(max-width: 640px) 68vw, 256px"
+                    className="object-cover object-center"
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ backgroundColor: `color-mix(in srgb, ${IVORY} 82%, ${MOTIF_CREAM})` }}
+                  >
+                    <Music2 className="h-8 w-8" style={{ color: MOTIF_BURGUNDY }} aria-hidden />
+                  </div>
+                )}
+              </div>
+            </div> */}
+
             <p
               className={`${cinzel.className} mb-4 text-center text-[0.625rem] font-semibold uppercase tracking-[0.2em] sm:mb-5 sm:text-[0.6875rem] sm:tracking-[0.24em] md:text-xs`}
               style={{ color: containerPalette.label }}
@@ -305,7 +358,7 @@ export function WeddingPlaylist() {
             <div
               ref={embedContainerRef}
               title={`${playlistName} — Spotify playlist`}
-              className="w-full min-h-[232px] overflow-hidden rounded-xl border md:min-h-[352px] [&_iframe]:border-0"
+              className="h-[352px] w-full overflow-hidden rounded-xl border [&_iframe]:h-full [&_iframe]:w-full [&_iframe]:border-0"
               style={{
                 borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 18%, transparent)`,
                 backgroundColor: `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
@@ -314,7 +367,7 @@ export function WeddingPlaylist() {
 
             <div className="mt-5 flex justify-center sm:mt-6">
               <a
-                href={spotifyUrl}
+                href={spotifyOpenUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${cinzel.className} group inline-flex items-center justify-center gap-2 rounded-full border px-6 py-2.5 font-semibold uppercase tracking-[0.2em] shadow-[0_8px_18px_color-mix(in_srgb,#531314_35%,transparent)] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,#531314_25%,transparent)] focus-visible:ring-offset-2 sm:px-8 sm:py-3 sm:tracking-[0.24em] md:px-10 md:py-3.5 md:tracking-[0.28em] ${ct.btn}`}
