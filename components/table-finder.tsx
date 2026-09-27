@@ -26,7 +26,11 @@ import { Cinzel } from "next/font/google"
 import localFont from "next/font/local"
 import { useSiteConfig } from "@/hooks/use-site-config"
 import { layeredSectionTitleSize, sectionType } from "@/lib/section-typography"
-import { sectionBackground } from "@/lib/section-background"
+
+const Silk = dynamic(() => import("@/components/silk"), { ssr: false })
+
+const enableDecor = process.env.NEXT_PUBLIC_ENABLE_DECOR !== "false"
+const SILK_FALLBACK = "#780008"
 
 const cinzel = Cinzel({
   subsets: ["latin"],
@@ -45,43 +49,63 @@ const aboveTheBeyond = localFont({
   variable: "--font-above-beyond",
 })
 
+const MOTIF_BURGUNDY = "#531314"
+const MOTIF_FOREST = "#052312"
 const IVORY = "#fffaf4"
-const GOLD = "var(--color-welcome-gold)"
-const NAVY = "var(--color-welcome-navy)"
-const SCRIPT = "var(--color-welcome-green)"
-const BODY = "var(--color-welcome-text)"
-const NAV_GOLD = "linear-gradient(180deg, #E8D5A3 0%, #CDB072 52%, #C4A265 100%)"
-const GOLD_BORDER = "color-mix(in srgb, var(--color-welcome-gold) 38%, transparent)"
-const GOLD_BORDER_SOFT = "color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)"
-const CHAMPAGNE = "#E8D5A3"
+const MOTIF_CREAM = "#f4f0e8"
+const TEXT_WHITE = "#ffffff"
+const TEXT_WHITE_SOFT = "color-mix(in srgb, #ffffff 82%, transparent)"
+const CHAMPAGNE = "#f5e6a8"
+const dividerFadeLight = "color-mix(in srgb, #ffffff 42%, transparent)"
+const BORDER_MOTIF = `color-mix(in srgb, ${MOTIF_BURGUNDY} 32%, transparent)`
+const BORDER_SOFT = `color-mix(in srgb, ${MOTIF_BURGUNDY} 22%, transparent)`
 
-const goldDividerStyle = {
-  background: "linear-gradient(to right, transparent, var(--color-welcome-gold), transparent)",
+const palette = {
+  body: `color-mix(in srgb, ${MOTIF_FOREST} 78%, #4a5c4e)`,
+  heading: MOTIF_FOREST,
+  label: MOTIF_BURGUNDY,
 } as const
 
-const goldDividerStyleLeft = {
-  background: "linear-gradient(to left, transparent, var(--color-welcome-gold), transparent)",
+const lightDividerStyle = {
+  background: `linear-gradient(to right, transparent, ${dividerFadeLight}, transparent)`,
+} as const
+
+const lightDividerStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${dividerFadeLight}, transparent)`,
+} as const
+
+const motifDividerStyle = {
+  background: `linear-gradient(to right, transparent, ${MOTIF_BURGUNDY}, transparent)`,
+} as const
+
+const motifDividerStyleLeft = {
+  background: `linear-gradient(to left, transparent, ${MOTIF_BURGUNDY}, transparent)`,
 } as const
 
 const cardStyle = {
-  background: IVORY,
-  borderColor: GOLD_BORDER,
+  background: `color-mix(in srgb, ${IVORY} 94%, ${MOTIF_CREAM})`,
+  borderColor: BORDER_MOTIF,
   borderWidth: "1px",
   borderStyle: "solid" as const,
   boxShadow:
-    "0 10px 28px color-mix(in srgb, var(--color-welcome-gold) 12%, transparent), inset 0 1px 0 rgb(255 250 244 / 70%)",
+    "0 10px 28px color-mix(in srgb, #052312 12%, transparent), inset 0 1px 0 color-mix(in srgb, white 75%, transparent)",
 } as const
 
 const innerSurfaceStyle = {
-  background: `color-mix(in srgb, ${IVORY} 82%, ${CHAMPAGNE})`,
-  borderColor: GOLD_BORDER_SOFT,
+  background: `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
+  borderColor: BORDER_SOFT,
 } as const
 
 const primaryButtonStyle = {
-  background: NAV_GOLD,
-  borderColor: GOLD_BORDER,
+  background: `linear-gradient(180deg, color-mix(in srgb, ${MOTIF_BURGUNDY} 90%, #000) 0%, ${MOTIF_BURGUNDY} 52%, color-mix(in srgb, ${MOTIF_BURGUNDY} 88%, #000) 100%)`,
+  borderColor: `color-mix(in srgb, ${MOTIF_BURGUNDY} 55%, transparent)`,
   color: IVORY,
-  boxShadow: "0 8px 18px color-mix(in srgb, var(--color-welcome-gold) 22%, transparent)",
+  boxShadow: "0 8px 22px color-mix(in srgb, #531314 28%, transparent)",
+} as const
+
+const accentCircleStyle = {
+  background: primaryButtonStyle.background,
+  color: IVORY,
 } as const
 
 const CORNER_DECO_CLASS =
@@ -229,7 +253,7 @@ function HighlightedText({ text, query }: { text: string; query: string }) {
         )
         if (!matched) return <span key={index}>{part}</span>
         return (
-          <span key={index} className="font-semibold" style={{ color: GOLD }}>
+          <span key={index} className="font-semibold" style={{ color: MOTIF_BURGUNDY }}>
             {part}
           </span>
         )
@@ -252,12 +276,16 @@ function rsvpCopy(status: RsvpStatus) {
   return { label: "Awaiting RSVP", short: "Pending" }
 }
 
-function OutsideDivider() {
+function OutsideDivider({ tone = "light" }: { tone?: "light" | "motif" }) {
+  const line = tone === "light" ? lightDividerStyle : motifDividerStyle
+  const lineLeft = tone === "light" ? lightDividerStyleLeft : motifDividerStyleLeft
+  const dot = tone === "light" ? dividerFadeLight : `color-mix(in srgb, ${MOTIF_BURGUNDY} 55%, transparent)`
+
   return (
     <div className="flex items-center justify-center gap-1.5">
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyle} />
-      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: GOLD }} aria-hidden />
-      <span className="h-px w-6 sm:w-10" style={goldDividerStyleLeft} />
+      <span className="h-px w-6 sm:w-10" style={line} aria-hidden />
+      <span className="h-0.5 w-0.5 rounded-full sm:h-1 sm:w-1" style={{ background: dot }} aria-hidden />
+      <span className="h-px w-6 sm:w-10" style={lineLeft} aria-hidden />
     </div>
   )
 }
@@ -276,17 +304,17 @@ function RsvpBadge({ status, compact = false }: { status: RsvpStatus; compact?: 
           : "px-2 py-0.5 text-[0.55rem] sm:px-2.5 sm:text-[0.625rem]"
       }`}
       style={{
-        color: isConfirmed ? "#3f5a32" : isDeclined ? "#9b3d3d" : BODY,
+        color: isConfirmed ? MOTIF_FOREST : isDeclined ? "#9b3d3d" : palette.body,
         borderColor: isConfirmed
-          ? "color-mix(in srgb, #5d6f47 35%, transparent)"
+          ? "color-mix(in srgb, #325f4b 35%, transparent)"
           : isDeclined
             ? "color-mix(in srgb, #9b3d3d 35%, transparent)"
-            : GOLD_BORDER,
+            : BORDER_SOFT,
         backgroundColor: isConfirmed
-          ? "color-mix(in srgb, #5d6f47 12%, white)"
+          ? "color-mix(in srgb, #325f4b 12%, white)"
           : isDeclined
             ? "color-mix(in srgb, #9b3d3d 8%, white)"
-            : `color-mix(in srgb, ${IVORY} 82%, ${CHAMPAGNE})`,
+            : `color-mix(in srgb, ${IVORY} 90%, ${MOTIF_CREAM})`,
       }}
     >
       <Icon className={compact ? "h-2.5 w-2.5" : "h-3 w-3"} aria-hidden />
@@ -468,41 +496,49 @@ export function TableFinder() {
   return (
     <main
       className={`${theSeasons.variable} ${aboveTheBeyond.variable} relative min-h-screen overflow-x-hidden`}
-      style={{ background: sectionBackground }}
+      style={{ background: SILK_FALLBACK }}
     >
+      {enableDecor && (
+        <div className="pointer-events-none fixed inset-0 z-0" aria-hidden>
+          <Suspense fallback={<div className="h-full w-full" style={{ background: SILK_FALLBACK }} />}>
+            <Silk speed={8} scale={0.9} color={SILK_FALLBACK} noiseIntensity={0} rotation={0.3} />
+          </Suspense>
+        </div>
+      )}
+
       <div className="pointer-events-none absolute left-0 top-0 z-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/decoration/left-top-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
+        <img src="/corner/left-top-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
       </div>
       <div className="pointer-events-none absolute right-0 top-0 z-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/decoration/right-top-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
+        <img src="/corner/right-top-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
       </div>
       <div className="pointer-events-none absolute bottom-0 left-0 z-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/decoration/left-bottom-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
+        <img src="/corner/left-bottom-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
       </div>
       <div className="pointer-events-none absolute bottom-0 right-0 z-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/decoration/right-bottom-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
+        <img src="/corner/right-bottom-corner.png" alt="" aria-hidden="true" className={CORNER_DECO_CLASS} />
       </div>
 
       <section className="relative z-20 mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-14 md:px-8">
         <div className="mx-auto max-w-xl text-center @container/table-hero">
           <div className="mx-auto mb-4 sm:mb-5">
-            <OutsideDivider />
+            <OutsideDivider tone="light" />
           </div>
 
           <p
             className={`${cinzel.className} ${sectionType.label} font-semibold uppercase leading-normal tracking-[0.18em] min-[400px]:tracking-[0.28em] sm:tracking-[0.36em]`}
-            style={{ color: GOLD }}
+            style={{ color: TEXT_WHITE }}
           >
             {groomName}
             <span
               className={`${aboveTheBeyond.className} mx-1 inline-block normal-case tracking-normal sm:mx-2`}
               style={{
                 fontSize: "1.35em",
-                color: SCRIPT,
+                color: CHAMPAGNE,
                 verticalAlign: "middle",
               }}
               aria-hidden
@@ -524,7 +560,11 @@ export function TableFinder() {
           >
             <span
               className={`${theSeasons.className} block uppercase leading-[0.76] tracking-[0.04em] min-[400px]:tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.14em]`}
-              style={{ fontSize: "var(--title-size)", color: NAVY }}
+              style={{
+                fontSize: "var(--title-size)",
+                color: TEXT_WHITE,
+                textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)",
+              }}
             >
               Find Your Table
             </span>
@@ -533,9 +573,8 @@ export function TableFinder() {
               className={`${aboveTheBeyond.className} relative z-10 mx-auto mt-[var(--script-overlap)] block w-fit max-w-full px-1 leading-[0.88] sm:leading-[0.9]`}
               style={{
                 fontSize: "var(--script-size)",
-                color: SCRIPT,
-                textShadow:
-                  "0 1px 0 color-mix(in srgb, var(--color-welcome-bg) 95%, white), 0 0 10px color-mix(in srgb, var(--color-welcome-bg) 65%, white)",
+                color: IVORY,
+                textShadow: "0 1px 12px rgba(0, 0, 0, 0.55)",
               }}
             >
               Please be seated
@@ -545,15 +584,15 @@ export function TableFinder() {
 
           <p
             className={`font-goudy-italic mx-auto mt-4 max-w-md px-2 sm:mt-5 ${sectionType.textRelaxed}`}
-            style={{ color: BODY }}
+            style={{ color: TEXT_WHITE_SOFT }}
           >
             Search your name to find your table, then walk in and take your seat.
           </p>
 
           <div className="mt-4 flex items-center justify-center gap-1.5 sm:mt-5">
-            <span className="h-px w-8 sm:w-12" style={goldDividerStyle} />
-            <Armchair className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: GOLD }} aria-hidden />
-            <span className="h-px w-8 sm:w-12" style={goldDividerStyleLeft} />
+            <span className="h-px w-8 sm:w-12" style={lightDividerStyle} aria-hidden />
+            <Armchair className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: CHAMPAGNE }} aria-hidden />
+            <span className="h-px w-8 sm:w-12" style={lightDividerStyleLeft} aria-hidden />
           </div>
 
           <div ref={searchRef} className="relative z-30 mx-auto mt-6 w-full sm:mt-8">
@@ -563,7 +602,7 @@ export function TableFinder() {
             <div className="relative">
               <Search
                 className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 sm:h-5 sm:w-5"
-                style={{ color: GOLD }}
+                style={{ color: palette.label }}
               />
               <input
                 id="table-search"
@@ -581,12 +620,12 @@ export function TableFinder() {
                   }
                 }}
                 placeholder="Search your name..."
-                className="w-full rounded-full border py-3.5 pl-12 pr-5 font-goudy-italic text-base outline-none transition-shadow duration-300 focus:shadow-lg sm:py-4 sm:pl-14"
+                className="w-full rounded-full border py-3.5 pl-12 pr-5 font-goudy-italic text-base outline-none transition-shadow duration-300 focus:shadow-lg focus:ring-2 focus:ring-[color-mix(in_srgb,#531314_22%,transparent)] sm:py-4 sm:pl-14"
                 style={{
-                  borderColor: GOLD_BORDER,
-                  color: NAVY,
+                  borderColor: BORDER_MOTIF,
+                  color: palette.heading,
                   backgroundColor: IVORY,
-                  boxShadow: "0 10px 28px color-mix(in srgb, var(--color-welcome-gold) 12%, transparent)",
+                  boxShadow: "0 10px 28px color-mix(in srgb, #052312 14%, transparent)",
                 }}
                 autoComplete="off"
                 autoCorrect="off"
@@ -599,7 +638,7 @@ export function TableFinder() {
                 className="absolute left-0 right-0 z-[9999] mt-2 overflow-hidden rounded-2xl border shadow-2xl"
                 style={{
                   backgroundColor: IVORY,
-                  borderColor: GOLD_BORDER,
+                  borderColor: BORDER_MOTIF,
                 }}
               >
                 {suggestions.map((seat) => (
@@ -609,9 +648,9 @@ export function TableFinder() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleSelectSeat(seat)}
                     className="flex w-full items-center gap-3 border-b px-3.5 py-2.5 text-left last:border-b-0 sm:px-4"
-                    style={{ borderColor: GOLD_BORDER_SOFT }}
+                    style={{ borderColor: BORDER_SOFT }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = `color-mix(in srgb, ${CHAMPAGNE} 28%, ${IVORY})`
+                      e.currentTarget.style.backgroundColor = `color-mix(in srgb, ${MOTIF_BURGUNDY} 8%, ${IVORY})`
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = "transparent"
@@ -619,31 +658,34 @@ export function TableFinder() {
                   >
                     <div
                       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-9 sm:w-9"
-                      style={{ background: NAV_GOLD }}
+                      style={accentCircleStyle}
                     >
                       <User className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: IVORY }} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div
                         className="truncate font-sans text-[0.9375rem] font-semibold normal-case"
-                        style={{ color: NAVY }}
+                        style={{ color: palette.heading }}
                       >
                         <HighlightedText text={seat.name} query={searchQuery} />
                       </div>
                       {seat.isCompanion && seat.primaryName ? (
-                        <div className={`${sectionType.label} mt-0.5 truncate normal-case`} style={{ color: BODY }}>
+                        <div
+                          className={`${sectionType.label} mt-0.5 truncate normal-case`}
+                          style={{ color: palette.body }}
+                        >
                           Guest of {seat.primaryName}
                         </div>
                       ) : null}
                     </div>
                     <span
                       className={`${theSeasons.className} shrink-0 text-base tracking-[0.02em]`}
-                      style={{ color: NAVY }}
+                      style={{ color: palette.heading }}
                     >
                       {seat.tableNumber ? (
                         <TableLabel label={formatTableLabel(seat.tableNumber)} />
                       ) : (
-                        <span className={`font-goudy-italic ${sectionType.label}`} style={{ color: BODY }}>
+                        <span className={`font-goudy-italic ${sectionType.label}`} style={{ color: palette.body }}>
                           No table yet
                         </span>
                       )}
@@ -653,7 +695,7 @@ export function TableFinder() {
                 {extraCount > 0 ? (
                   <p
                     className={`font-goudy-italic px-4 py-2 text-center ${sectionType.label}`}
-                    style={{ color: BODY }}
+                    style={{ color: palette.body }}
                   >
                     Keep typing to narrow {extraCount} more {extraCount === 1 ? "name" : "names"}
                   </p>
@@ -666,10 +708,10 @@ export function TableFinder() {
                 className="absolute left-0 right-0 z-[9999] mt-2 rounded-2xl border px-4 py-3.5 text-left shadow-xl"
                 style={{
                   backgroundColor: IVORY,
-                  borderColor: GOLD_BORDER,
+                  borderColor: BORDER_MOTIF,
                 }}
               >
-                <p className={`font-goudy-italic ${sectionType.textSnug}`} style={{ color: BODY }}>
+                <p className={`font-goudy-italic ${sectionType.textSnug}`} style={{ color: palette.body }}>
                   We couldn&apos;t find that name. Try another spelling, or ask the couple if
                   you&apos;re not on the list.
                 </p>
@@ -684,9 +726,9 @@ export function TableFinder() {
             style={cardStyle}
           >
             <div className="wedding-frame-inner hidden min-[400px]:block" aria-hidden />
-            <p className={`font-goudy-italic ${sectionType.text}`} style={{ color: BODY }}>
+            <p className={`font-goudy-italic ${sectionType.text}`} style={{ color: palette.body }}>
               Hello{" "}
-              <span className="font-semibold" style={{ color: NAVY }}>
+              <span className="font-semibold" style={{ color: palette.heading }}>
                 {selectedSeat.name}
               </span>
               {selectedSeat.isCompanion && selectedSeat.primaryName
@@ -696,16 +738,16 @@ export function TableFinder() {
 
             {selectedSeat.tableNumber ? (
               <>
-                <div className="mx-auto my-4 h-px w-16" style={goldDividerStyle} />
+                <div className="mx-auto my-4 h-px w-16" style={motifDividerStyle} aria-hidden />
                 <p
                   className={`${cinzel.className} text-[0.65rem] font-semibold uppercase tracking-[0.22em]`}
-                  style={{ color: GOLD }}
+                  style={{ color: palette.label }}
                 >
                   Your table
                 </p>
                 <p
                   className={`${theSeasons.className} mt-2 text-[2.15rem] leading-none tracking-[0.04em] sm:text-5xl`}
-                  style={{ color: NAVY }}
+                  style={{ color: palette.heading }}
                 >
                   <TableLabel label={formatTableLabel(selectedSeat.tableNumber)} />
                 </p>
@@ -713,7 +755,7 @@ export function TableFinder() {
             ) : (
               <p
                 className={`${theSeasons.className} mt-4 text-lg tracking-[0.04em] sm:text-xl`}
-                style={{ color: NAVY }}
+                style={{ color: palette.heading }}
               >
                 Your table will be posted soon
               </p>
@@ -725,7 +767,7 @@ export function TableFinder() {
 
             <p
               className={`font-goudy-italic mx-auto mt-3 max-w-md ${sectionType.textSnug}`}
-              style={{ color: BODY }}
+              style={{ color: palette.body }}
             >
               {selectedSeat.status === "confirmed" && selectedSeat.tableNumber
                 ? "You're all set. Find your table and enjoy the celebration."
@@ -752,7 +794,7 @@ export function TableFinder() {
               <div className="mt-5 rounded-xl border p-3 text-left sm:p-4" style={innerSurfaceStyle}>
                 <p
                   className={`${cinzel.className} mb-2 text-[0.6rem] font-semibold uppercase tracking-[0.16em]`}
-                  style={{ color: GOLD }}
+                  style={{ color: palette.label }}
                 >
                   Seated with you
                 </p>
@@ -761,7 +803,7 @@ export function TableFinder() {
                     <li key={mate.key} className="flex items-center justify-between gap-2">
                       <span
                         className={`min-w-0 truncate font-goudy-italic ${sectionType.text}`}
-                        style={{ color: NAVY }}
+                        style={{ color: palette.heading }}
                       >
                         {mate.name}
                       </span>
@@ -777,21 +819,28 @@ export function TableFinder() {
         <div className="mx-auto mt-10 max-w-6xl sm:mt-16">
           <div className="mb-5 text-center sm:mb-7">
             <div className="mx-auto mb-3">
-              <OutsideDivider />
+              <OutsideDivider tone="light" />
             </div>
             <h2
               className={`${theSeasons.className} text-xl uppercase tracking-[0.12em] sm:text-3xl`}
-              style={{ color: NAVY }}
+              style={{ color: TEXT_WHITE, textShadow: "0 1px 10px rgba(0, 0, 0, 0.45)" }}
             >
               Seating Chart
             </h2>
             <p
               className={`${aboveTheBeyond.className} mx-auto mt-1 block w-fit`}
-              style={{ color: SCRIPT, fontSize: "clamp(1.05rem, 3.4vw, 1.75rem)" }}
+              style={{
+                color: IVORY,
+                fontSize: "clamp(1.05rem, 3.4vw, 1.75rem)",
+                textShadow: "0 1px 12px rgba(0, 0, 0, 0.55)",
+              }}
             >
               everyone together
             </p>
-            <p className={`font-goudy-italic mx-auto mt-2 max-w-xl px-2 ${sectionType.text}`} style={{ color: BODY }}>
+            <p
+              className={`font-goudy-italic mx-auto mt-2 max-w-xl px-2 ${sectionType.text}`}
+              style={{ color: TEXT_WHITE_SOFT }}
+            >
               Everyone is grouped by table. RSVP status sits beside each name.
             </p>
             <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
@@ -802,14 +851,14 @@ export function TableFinder() {
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center gap-2 py-10" style={{ color: BODY }}>
-              <RefreshCw className="h-4 w-4 animate-spin" style={{ color: GOLD }} />
+            <div className="flex items-center justify-center gap-2 py-10" style={{ color: TEXT_WHITE_SOFT }}>
+              <RefreshCw className="h-4 w-4 animate-spin" style={{ color: CHAMPAGNE }} />
               <span className={`font-goudy-italic ${sectionType.text}`}>Loading seating...</span>
             </div>
           ) : error ? (
             <div className="mx-auto max-w-md rounded-2xl border p-5 text-center" style={cardStyle}>
               <AlertCircle className="mx-auto mb-2 h-5 w-5" style={{ color: "#9b3d3d" }} />
-              <p className={`font-goudy-italic ${sectionType.text}`} style={{ color: BODY }}>
+              <p className={`font-goudy-italic ${sectionType.text}`} style={{ color: palette.body }}>
                 {error}
               </p>
               <button
@@ -823,7 +872,7 @@ export function TableFinder() {
               </button>
             </div>
           ) : tables.length === 0 ? (
-            <p className={`font-goudy-italic text-center ${sectionType.text}`} style={{ color: BODY }}>
+            <p className={`font-goudy-italic text-center ${sectionType.text}`} style={{ color: TEXT_WHITE_SOFT }}>
               Seating is still being arranged. Search your name above, or check back soon.
             </p>
           ) : (
@@ -839,21 +888,20 @@ export function TableFinder() {
                     className="rounded-2xl border p-3.5 sm:p-5"
                     style={{
                       ...cardStyle,
-                      borderColor: isSelectedTable ? "var(--color-welcome-gold)" : GOLD_BORDER,
+                      borderColor: isSelectedTable ? MOTIF_BURGUNDY : BORDER_MOTIF,
                       boxShadow: isSelectedTable
-                        ? "0 12px 36px color-mix(in srgb, var(--color-welcome-gold) 28%, transparent), inset 0 1px 0 rgb(255 250 244 / 70%)"
+                        ? "0 12px 36px color-mix(in srgb, #531314 22%, transparent), inset 0 1px 0 color-mix(in srgb, white 75%, transparent)"
                         : cardStyle.boxShadow,
                     }}
                   >
                     <div
                       className="mb-3 flex items-center gap-3 border-b pb-3"
-                      style={{ borderColor: GOLD_BORDER_SOFT }}
+                      style={{ borderColor: BORDER_SOFT }}
                     >
                       <div
                         className={`${cinzel.className} flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg font-bold sm:h-12 sm:w-12 sm:text-xl`}
                         style={{
-                          background: NAV_GOLD,
-                          color: IVORY,
+                          ...accentCircleStyle,
                           fontWeight: 700,
                         }}
                       >
@@ -862,11 +910,11 @@ export function TableFinder() {
                       <div className="min-w-0">
                         <p
                           className={`${theSeasons.className} text-lg tracking-[0.04em] sm:text-xl`}
-                          style={{ color: NAVY }}
+                          style={{ color: palette.heading }}
                         >
                           <TableLabel label={table.label} />
                         </p>
-                        <p className={`font-goudy-italic ${sectionType.label}`} style={{ color: BODY }}>
+                        <p className={`font-goudy-italic ${sectionType.label}`} style={{ color: palette.body }}>
                           {table.seats.length} {table.seats.length === 1 ? "guest" : "guests"}
                           {" · "}
                           {confirmedCount} confirmed
@@ -882,7 +930,7 @@ export function TableFinder() {
                             className="flex items-center justify-between gap-2 rounded-lg px-1.5 py-1.5 sm:px-2"
                             style={{
                               backgroundColor: isSelected
-                                ? `color-mix(in srgb, ${CHAMPAGNE} 32%, ${IVORY})`
+                                ? `color-mix(in srgb, ${MOTIF_BURGUNDY} 10%, ${IVORY})`
                                 : "transparent",
                             }}
                           >
@@ -891,12 +939,12 @@ export function TableFinder() {
                                 className={`truncate font-goudy-italic text-[0.8125rem] sm:text-[0.9375rem] ${
                                   seat.status === "declined" ? "line-through opacity-70" : ""
                                 }`}
-                                style={{ color: NAVY }}
+                                style={{ color: palette.heading }}
                               >
                                 {seat.name}
                               </p>
                               {seat.isCompanion && seat.primaryName ? (
-                                <p className={`${sectionType.label} truncate`} style={{ color: BODY }}>
+                                <p className={`${sectionType.label} truncate`} style={{ color: palette.body }}>
                                   Guest of {seat.primaryName}
                                   {seat.relationship ? ` · ${seat.relationship}` : ""}
                                 </p>
@@ -916,17 +964,17 @@ export function TableFinder() {
 
         <div
           className="mx-auto mt-12 max-w-4xl border-t pt-8 sm:mt-16 sm:pt-10"
-          style={{ borderColor: GOLD_BORDER }}
+          style={{ borderColor: dividerFadeLight }}
         >
           <p
             className={`${cinzel.className} mb-2 text-center text-[0.65rem] font-semibold uppercase tracking-[0.2em] sm:text-[0.6875rem] sm:tracking-[0.22em]`}
-            style={{ color: GOLD }}
+            style={{ color: CHAMPAGNE }}
           >
             How it works
           </p>
           <p
             className={`font-goudy-italic mx-auto mb-5 max-w-md px-2 text-center sm:mb-6 ${sectionType.textSnug}`}
-            style={{ color: BODY }}
+            style={{ color: TEXT_WHITE_SOFT }}
           >
             Three simple steps from the doorway to your seat.
           </p>
@@ -935,25 +983,25 @@ export function TableFinder() {
               <div key={item.title} className="rounded-xl border px-2 py-4 text-center sm:px-4 sm:py-5" style={cardStyle}>
                 <p
                   className={`${cinzel.className} text-[0.5rem] font-semibold uppercase tracking-[0.16em] sm:text-[0.625rem] sm:tracking-[0.22em]`}
-                  style={{ color: GOLD }}
+                  style={{ color: palette.label }}
                 >
                   {item.step}
                 </p>
                 <div
                   className="mx-auto my-2.5 flex h-9 w-9 items-center justify-center rounded-full sm:my-3 sm:h-10 sm:w-10"
-                  style={{ background: NAV_GOLD }}
+                  style={accentCircleStyle}
                 >
                   <item.icon className="h-4 w-4" style={{ color: IVORY }} />
                 </div>
                 <h3
                   className={`${theSeasons.className} text-[0.9rem] tracking-[0.06em] sm:text-xl sm:tracking-[0.08em]`}
-                  style={{ color: NAVY }}
+                  style={{ color: palette.heading }}
                 >
                   {item.title}
                 </h3>
                 <p
                   className={`font-goudy-italic mx-auto mt-1.5 max-w-[16rem] text-[0.65rem] leading-snug sm:mt-2 sm:text-[inherit] ${sectionType.textSnug}`}
-                  style={{ color: BODY }}
+                  style={{ color: palette.body }}
                 >
                   {item.body}
                 </p>
