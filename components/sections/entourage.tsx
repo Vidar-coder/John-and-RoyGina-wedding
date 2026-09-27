@@ -3,8 +3,9 @@
 import React from "react"
 import { useState, useEffect, useMemo, useRef } from "react"
 import localFont from "next/font/local"
-import { entourage as staticEntourage, principalSponsors as staticSponsors } from "@/content/site"
 import { useSiteConfig } from "@/hooks/use-site-config"
+import { fetchUntilReady, isAbortError } from "@/lib/fetch-until-ready"
+import { fetchInvitationList, invalidateInvitationData } from "@/lib/invitation-data"
 import { cornerTextureBackgroundStyle } from "@/lib/corner-texture-background"
 import { sectionType } from "@/lib/section-typography"
 import { Cinzel } from "next/font/google"
@@ -175,40 +176,24 @@ const ct = {
   bodyLg: sectionType.subheader,
 } as const
 
-function mapStaticEntourage(): EntourageMember[] {
-  const roleToCategory: Record<string, string> = {
-    "Best Man": "Best Man",
-    "Matron of Honor": "Matron of Honor",
-    "Maid of Honor": "Maid of Honor",
-    "Bridesmaid": "Bridesmaids",
-    "Groomsman": "Groomsmen",
-    "Father": "Parents of the Bride",
-    "Mother": "Parents of the Bride",
-    "Brother": "Parents of the Groom",
-    "Flower Girl": "Flower Ladies",
-    "Little Bride": "Little Bride",
-    "Little Groom": "Little Groom",
-    "Ring Bearer": "Ring Bearer",
-    "Coin Bearer": "Coin Bearer",
-    "Bible Bearer": "Bible Bearer",
-  }
-  return staticEntourage.map(({ role, name, group }) => {
-    let category = roleToCategory[role] ?? (role.endsWith("s") ? role : role + "s")
-    if (group === "kate-family") category = "Parents of the Bride"
-    if (group === "christian-family") category = "Parents of the Groom"
-    if (group === "candle") category = "Candle Sponsors"
-    if (group === "cord") category = "Cord Sponsors"
-    return { name, roleTitle: role, roleCategory: category, email: "" }
+async function loadEntourageMembers(signal: AbortSignal, reload = false) {
+  const data = await fetchInvitationList<Record<string, unknown>>("/api/entourage", {
+    signal,
+    reload,
   })
+  return data
+    .map((row) => entourageMemberFromApi(row))
+    .filter((member) => member.name.trim().length > 0)
 }
 
-function mapStaticSponsors(): PrincipalSponsor[] {
-  return staticSponsors
-    .filter((s) => s.name || s.spouse)
-    .map(({ name, spouse }) => ({
-      malePrincipalSponsor: name || "",
-      femalePrincipalSponsor: spouse || "",
-    }))
+async function loadSponsorPairs(signal: AbortSignal, reload = false) {
+  const data = await fetchInvitationList<Record<string, unknown>>("/api/principal-sponsor", {
+    signal,
+    reload,
+  })
+  return data
+    .map((row) => principalSponsorFromApi(row))
+    .filter((sponsor) => sponsor.malePrincipalSponsor || sponsor.femalePrincipalSponsor)
 }
 
 const ROLE_CATEGORY_ORDER = [
@@ -304,59 +289,73 @@ export function Entourage() {
   const [error, setError] = useState<string | null>(null)
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
-
-  const fetchEntourage = async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const response = await fetch("/api/entourage", { cache: "no-store" })
-      if (!response.ok) throw new Error("Failed to fetch entourage")
-      const data: unknown = await response.json()
-      const list =
-        Array.isArray(data) && data.length > 0
-          ? data.map((row) => entourageMemberFromApi(row as Record<string, unknown>))
-          : mapStaticEntourage()
-      setEntourage(list)
-    } catch (err: unknown) {
-      console.error("Failed to load entourage:", err)
-      setEntourage(mapStaticEntourage())
-      setError(null)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const fetchSponsors = async () => {
-    try {
-      const res = await fetch("/api/principal-sponsor", { cache: "no-store" })
-      if (!res.ok) throw new Error("Failed to load principal sponsors")
-      const data: unknown = await res.json()
-      const list =
-        Array.isArray(data) && data.length > 0
-          ? data.map((row) => principalSponsorFromApi(row as Record<string, unknown>)).filter((s) => s.malePrincipalSponsor || s.femalePrincipalSponsor)
-          : mapStaticSponsors()
-      setSponsors(list)
-    } catch (e: unknown) {
-      console.error("Failed to load sponsors:", e)
-      setSponsors(mapStaticSponsors())
-    }
-  }
+  const retryRef = useRef<() => void>(() => {})
+  const hasEntourageRef = useRef(false)
 
   useEffect(() => {
-    fetchEntourage()
-    fetchSponsors()
+    let controller = new AbortController()
+    let disposed = false
 
-    // Set up auto-refresh listener for dashboard updates
+    const run = (reload = false) => {
+      controller.abort()
+      controller = new AbortController()
+      const { signal } = controller
+
+      if (!hasEntourageRef.current) setIsLoading(true)
+
+      void fetchUntilReady({
+        signal,
+        load: (nextSignal) => loadEntourageMembers(nextSignal, reload),
+        isReady: (list) => list.length > 0,
+      })
+        .then((list) => {
+          if (signal.aborted || disposed) return
+          hasEntourageRef.current = true
+          setEntourage(list)
+          setError(null)
+          setIsLoading(false)
+        })
+        .catch((error: unknown) => {
+          if (isAbortError(error) || disposed) return
+          console.error("Failed to load entourage:", error)
+          setError("The entourage is still loading. Please try again.")
+          setIsLoading(false)
+        })
+
+      void fetchUntilReady({
+        signal,
+        load: (nextSignal) => loadSponsorPairs(nextSignal, reload),
+        isReady: (list) => list.length > 0,
+      })
+        .then((list) => {
+          if (signal.aborted || disposed) return
+          setSponsors(list)
+        })
+        .catch((error: unknown) => {
+          if (isAbortError(error) || disposed) return
+          console.error("Failed to load sponsors:", error)
+        })
+    }
+
+    retryRef.current = () => {
+      invalidateInvitationData("/api/entourage")
+      invalidateInvitationData("/api/principal-sponsor")
+      run(true)
+    }
+
+    run(false)
+
     const handleEntourageUpdate = () => {
-      setTimeout(() => {
-        fetchEntourage()
-        fetchSponsors()
+      window.setTimeout(() => {
+        if (!disposed) retryRef.current()
       }, 1000)
     }
 
     window.addEventListener("entourageUpdated", handleEntourageUpdate)
 
     return () => {
+      disposed = true
+      controller.abort()
       window.removeEventListener("entourageUpdated", handleEntourageUpdate)
     }
   }, [])
@@ -610,7 +609,7 @@ export function Entourage() {
                     {error}
                   </p>
                   <button
-                    onClick={fetchEntourage}
+                    onClick={() => retryRef.current()}
                     className={`${cinzel.className} ${ct.body} underline transition-colors duration-200 hover:opacity-80`}
                     style={{ color: palette.accent }}
                   >
